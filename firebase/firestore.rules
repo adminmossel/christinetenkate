@@ -1,0 +1,73 @@
+rules_version = '2';
+
+// Firestore Security Rules
+//
+// Uitgangspunt: een gewone bezoeker kan NOOIT iets wijzigen. Alleen een
+// ingelogde gebruiker die ook voorkomt in de collectie "admins" mag
+// content aanmaken, wijzigen of verwijderen. Dit wordt hieronder bij elke
+// collectie apart afgedwongen — vertrouw nooit op de admin-check in de
+// JavaScript-code alleen, want die kan een bezoeker omzeilen. Deze regels
+// hier kunnen niet omzeild worden.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // ---- admins ----
+    // Beheerders worden uitsluitend via de Firebase Console toegevoegd
+    // (zie INSTALLATIE.md). Dit voorkomt dat iemand zichzelf via de browser
+    // beheerrechten zou kunnen geven.
+    match /admins/{adminId} {
+      allow read: if request.auth != null && request.auth.uid == adminId;
+      allow write: if false;
+    }
+
+    // ---- pages ----
+    match /pages/{pageId} {
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow create, update, delete: if isAdmin();
+
+      match /versions/{versionId} {
+        allow read, write: if isAdmin();
+      }
+    }
+
+    // ---- menu ----
+    // Publiek leesbaar (nodig voor de navigatiebalk), alleen beheerders
+    // mogen het wijzigen.
+    match /menu/{menuId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---- settings ----
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---- media ----
+    match /media/{mediaId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ---- submissions (contactformulier) ----
+    // Iedereen mag een bericht aanmaken (dat is het hele punt van een
+    // contactformulier), maar NIEMAND behalve een beheerder mag berichten
+    // lezen, wijzigen of verwijderen — zo kan een bezoeker nooit andermans
+    // berichten inzien.
+    match /submissions/{submissionId} {
+      allow create: if request.resource.data.keys().hasOnly(['name','email','message','page','createdAt','read'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 200
+        && request.resource.data.email is string && request.resource.data.email.size() <= 200
+        && request.resource.data.message is string && request.resource.data.message.size() <= 5000
+        && request.resource.data.read == false;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,81 @@
+/*
+  admin-theme.css
+  Herdefinieert de kleur- en typografie-tokens alléén binnen het admin-
+  paneel (de "builder"), in een strakke, Apple-achtige blauw/wit-stijl.
+  De publieke website (die oma's bezoekers zien) behoudt haar eigen warme
+  kleurstijl uit /css/tokens.css — dit bestand raakt daar niets aan.
+*/
+
+body.admin {
+  --color-bg:            #FFFFFF;
+  --color-bg-soft:       #F5F5F7;
+  --color-ink:           #1D1D1F;
+  --color-ink-soft:      #6E6E73;
+  --color-primary:       #0071E3;
+  --color-primary-dark:  #0058B0;
+  --color-accent:        #0071E3;
+  --color-accent-soft:   #D6E9FB;
+  --color-teal:          #0071E3;
+  --color-line:          #D2D2D7;
+  --color-error:         #D70015;
+  --color-success:       #1E8E3E;
+
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  background: var(--color-bg-soft);
+}
+
+body.admin h1, body.admin h2, body.admin h3,
+body.admin h4, body.admin h5, body.admin h6 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+body.admin .btn-admin {
+  border-radius: 980px;
+  padding: 8px 18px;
+  border-color: var(--color-line);
+  font-weight: 500;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+body.admin .btn-admin--primary {
+  border: none;
+  box-shadow: 0 1px 2px rgba(0,113,227,0.25);
+}
+body.admin .btn-admin--danger {
+  border-color: var(--color-error);
+}
+
+body.admin .admin-sidebar {
+  background: var(--color-primary);
+}
+body.admin .admin-sidebar a.is-active,
+body.admin .admin-sidebar a:hover {
+  background: rgba(255,255,255,0.16);
+}
+
+body.admin .admin-card {
+  border-radius: var(--radius-md);
+  border-color: var(--color-line);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+body.admin .status-pill--published { background: #E6F6EA; color: var(--color-success); }
+body.admin .status-pill--draft { background: var(--color-bg-soft); color: var(--color-ink-soft); }
+body.admin .status-pill--trashed { background: #FCE4E4; color: var(--color-error); }
+
+body.admin .login-box { border-radius: var(--radius-md); }
+
+body.admin input[type="text"],
+body.admin input[type="email"],
+body.admin input[type="password"],
+body.admin input[type="search"],
+body.admin textarea,
+body.admin select {
+  border-radius: 8px;
+}
+
+body.admin a { color: var(--color-primary); }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Mediabibliotheek — Beheer</title>
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/admin/css/admin.css" />
+  <link rel="stylesheet" href="/admin/css/admin-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="admin">
+  <div id="admin-main-content">
+    <div class="admin-header">
+      <div>
+        <h1>Mediabibliotheek</h1>
+        <p style="color:var(--color-ink-soft);">Alle geüploade afbeeldingen en bestanden.</p>
+      </div>
+      <div>
+        <input type="file" id="upload-input" style="display:none;">
+        <button class="btn-admin btn-admin--primary" id="upload-btn">+ Bestand uploaden</button>
+      </div>
+    </div>
+    <div class="admin-field" style="max-width:320px;">
+      <input type="search" id="media-search" placeholder="Zoeken op bestandsnaam…">
+    </div>
+    <div id="upload-status" style="font-size:var(--fs-sm);color:var(--color-ink-soft);margin-bottom:8px;"></div>
+    <div class="admin-card">
+      <div class="media-grid" id="media-library-grid">
+        <p>Bibliotheek wordt geladen…</p>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/admin/js/media-library.js"></script>
+</body>
+</html>

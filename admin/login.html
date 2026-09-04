@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Inloggen — Beheer</title>
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/admin/css/admin.css" />
+  <link rel="stylesheet" href="/admin/css/admin-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="admin">
+  <div class="login-screen">
+    <div class="login-box">
+      <h1>Beheer — Christine ten Kate</h1>
+      <form id="login-form">
+        <div class="admin-field">
+          <label for="email">E-mailadres</label>
+          <input type="email" id="email" name="email" required autocomplete="username" />
+        </div>
+        <div class="admin-field">
+          <label for="password">Wachtwoord</label>
+          <input type="password" id="password" name="password" required autocomplete="current-password" />
+        </div>
+        <p id="login-error" class="form-status error" role="alert"></p>
+        <button type="submit" class="btn" style="width:100%;">Inloggen</button>
+      </form>
+      <p style="margin-top:var(--space-3);">
+        <a href="#" id="reset-link" style="font-size: var(--fs-sm);">Wachtwoord vergeten?</a>
+      </p>
+    </div>
+  </div>
+  <script type="module" src="/admin/js/admin-login.js"></script>
+</body>
+</html>

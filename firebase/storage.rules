@@ -1,0 +1,32 @@
+rules_version = '2';
+
+// Storage Security Rules
+//
+// Bestanden in /media/ zijn publiek leesbaar (dat moet ook, anders zou een
+// bezoeker geen foto's kunnen zien of documenten kunnen downloaden), maar
+// alleen beheerders mogen bestanden uploaden of verwijderen. Er geldt een
+// maximale bestandsgrootte van 15 MB — pas dit samen met MAX_FILE_SIZE in
+// admin/js/media-picker.js aan als jullie dit willen wijzigen.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null &&
+        firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+    }
+
+    match /media/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource.size < 15 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*|application/pdf|application/msword|application/vnd\\.openxmlformats-officedocument\\..*|application/vnd\\.ms-excel|text/plain');
+      allow delete: if isAdmin();
+    }
+
+    // Alles buiten /media/ is standaard afgesloten.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
