@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Menu — Beheer</title>
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/admin/css/admin.css" />
+  <link rel="stylesheet" href="/admin/css/admin-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="admin">
+  <div id="admin-main-content">
+    <div class="admin-header">
+      <div>
+        <h1>Navigatiemenu</h1>
+        <p style="color:var(--color-ink-soft);">Bepaal welke pagina's en links in het menu bovenaan de site staan. Sleep om de volgorde te wijzigen.</p>
+      </div>
+      <button class="btn-admin btn-admin--primary" id="save-menu-btn">Opslaan</button>
+    </div>
+    <div class="admin-card" id="menu-list">Menu wordt geladen…</div>
+    <button class="btn-admin" id="add-item-btn">+ Menu-item toevoegen</button>
+  </div>
+  <script type="module" src="/admin/js/menu-editor.js"></script>
+</body>
+</html>

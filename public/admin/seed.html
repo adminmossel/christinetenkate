@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Startinhoud plaatsen — Beheer</title>
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/admin/css/admin.css" />
+  <link rel="stylesheet" href="/admin/css/admin-theme.css" />
+</head>
+<body class="admin">
+  <div id="admin-main-content">
+    <div class="admin-header">
+      <div>
+        <h1>Startinhoud plaatsen</h1>
+        <p style="color:var(--color-ink-soft);max-width:60ch;">
+          Dit vult de website eenmalig met een startpunt: het menu, het logo,
+          de echte contactgegevens, de Privacy Policy-tekst en een aantal
+          pagina's met tijdelijke tekst die je later zelf via de editor kunt
+          aanpassen of verwijderen. Bestaande pagina's met dezelfde
+          URL/slug worden bijgewerkt, dus voer dit niet nogmaals uit nadat
+          je zelf al inhoud hebt aangepast — dan overschrijf je je eigen werk.
+        </p>
+      </div>
+    </div>
+    <div class="admin-card">
+      <button class="btn-admin btn-admin--primary" id="run-seed-btn">Website vullen met startinhoud</button>
+      <div id="seed-log" style="margin-top:16px;font-size:var(--fs-sm);"></div>
+    </div>
+  </div>
+  <script type="module" src="/admin/js/seed.js"></script>
+</body>
+</html>

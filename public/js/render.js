@@ -4,9 +4,20 @@
 // publieke site als de voorbeeldweergave in het admin-paneel, zodat preview
 // en live pagina altijd exact hetzelfde resultaat tonen.
 //
+// BELANGRIJK over media: een blok bevat NOOIT de foto/bestand-data zelf,
+// alleen een verwijzing (`mediaId`) naar een document in de Firestore-
+// collectie "media" (waar de data wél staat, zie admin/js/media-picker.js).
+// Dat is bewust zo: Firestore-documenten mogen max. ~1 MB zijn, en een
+// pagina met meerdere foto's zou die grens al snel raken als de foto's zelf
+// in de pagina-tekst zouden staan. `renderBlocks` heeft daarom een
+// `mediaMap` nodig — een object `{ [mediaId]: mediaDocument }` dat van
+// tevoren is opgehaald (zie `collectMediaIds` + `fetchMediaMap`, gebruikt
+// door app.js en editor-core.js).
+//
 // Vereist dat DOMPurify globaal beschikbaar is (geladen via <script> tag,
-// zie index.html) — dat is de bibliotheek die tekst-HTML opschoont zodat
-// een bezoeker nooit kwaadaardige scripts via een tekstblok kan uitvoeren.
+// zie index.html/editor.html) — dat is de bibliotheek die
+// tekst-HTML opschoont zodat een bezoeker nooit kwaadaardige scripts via
+// een tekstblok kan uitvoeren.
 
 function el(tag, className, attrs = {}) {
   const node = document.createElement(tag);
@@ -18,37 +29,76 @@ function el(tag, className, attrs = {}) {
   return node;
 }
 
+// Links van het type "file" verwijzen naar een mediaId, niet naar een kant-
+// en-klare URL — die moet dus altijd via mediaMap opgezocht worden. Alle
+// andere linktypes zijn wel direct om te zetten naar een href.
 function resolveLink(link) {
-  // link = { type: 'page'|'external'|'email'|'phone'|'file'|'anchor', value, newTab }
   if (!link || !link.value) return "#";
   switch (link.type) {
     case "page": return `/${link.value.replace(/^\//, "")}`;
     case "email": return `mailto:${link.value}`;
     case "phone": return `tel:${link.value.replace(/\s+/g, "")}`;
     case "anchor": return `#${link.value.replace(/^#/, "")}`;
-    case "file":
+    case "file": return `media:${link.value}`; // wordt hieronder altijd nog vertaald
     case "external":
     default: return link.value;
   }
 }
 
-function sanitize(html) {
-  if (window.DOMPurify) {
-    return window.DOMPurify.sanitize(html, {
-      ALLOWED_TAGS: ["b","strong","i","em","u","s","strike","sup","sub","a","br","p","ul","ol","li","blockquote","hr","span"],
-      ALLOWED_ATTR: ["href","target","rel","style"],
-    });
+/**
+ * Zet <a href> en target/rel op `node` voor een link-object. Lost het
+ * speciale "file"-linktype op via mediaMap (en voegt een download-attribuut
+ * toe — nodig omdat browsers een rechtstreekse navigatie naar een
+ * data:-URL blokkeren, downloads zijn wel toegestaan).
+ */
+function applyLink(node, link, mediaMap) {
+  if (!link || !link.value) return;
+  if (link.type === "file") {
+    const media = mediaMap[link.value];
+    if (!media) { node.removeAttribute("href"); return; }
+    node.setAttribute("href", media.url);
+    node.setAttribute("download", media.name || "bestand");
+    return;
   }
-  // Noodoplossing als DOMPurify niet geladen kon worden: platte tekst tonen
-  // in plaats van HTML te renderen (veilig, maar zonder opmaak).
+  node.setAttribute("href", resolveLink(link));
+  if (link.newTab) { node.setAttribute("target", "_blank"); node.setAttribute("rel", "noopener"); }
+}
+
+function sanitize(html) {
+  const config = {
+    ALLOWED_TAGS: ["b","strong","i","em","u","s","strike","sup","sub","a","br","p","ul","ol","li","blockquote","hr","span"],
+    ALLOWED_ATTR: ["href","target","rel","style"],
+    // Staat naast de gebruikelijke veilige schema's (http, https, mailto,
+    // tel) ook ons eigen "media:<id>"-schema toe, dat hieronder na het
+    // sanitizen wordt vertaald naar een echte downloadlink.
+    ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel|media):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+  };
+  if (window.DOMPurify) return window.DOMPurify.sanitize(html, config);
   const p = document.createElement("p");
   p.textContent = html.replace(/<[^>]*>/g, "");
   return p.outerHTML;
 }
 
-function renderTextBlock(block) {
+/** Vertaalt <a href="media:xyz"> links (ingevoegd via de rijke-tekst-editor) naar echte downloadlinks. */
+function resolveMediaLinksInPlace(container, mediaMap) {
+  container.querySelectorAll('a[href^="media:"]').forEach((a) => {
+    const id = a.getAttribute("href").slice("media:".length);
+    const media = mediaMap[id];
+    if (media) {
+      a.setAttribute("href", media.url);
+      a.setAttribute("download", media.name || "bestand");
+      a.removeAttribute("target");
+    } else {
+      a.removeAttribute("href");
+      a.title = "Dit bestand is niet meer beschikbaar.";
+    }
+  });
+}
+
+function renderTextBlock(block, mediaMap) {
   const wrap = el("div", `block-text align-${block.align || "left"}`);
   wrap.innerHTML = sanitize(block.html || "");
+  resolveMediaLinksInPlace(wrap, mediaMap);
   return wrap;
 }
 
@@ -60,21 +110,24 @@ function renderHeadingBlock(block) {
   return heading;
 }
 
-function renderImageBlock(block) {
+function renderImageBlock(block, mediaMap) {
+  const media = mediaMap[block.mediaId];
   const figure = el("figure", `block-image align-${block.align || "center"}`);
+  if (!media) { figure.innerHTML = `<p class="state-message">Afbeelding niet gevonden.</p>`; return figure; }
   if (block.widthPercent) figure.style.maxWidth = `${block.widthPercent}%`;
   let imgHolder = figure;
   if (block.link && block.link.value) {
-    const a = el("a", null, { href: resolveLink(block.link), target: block.link.newTab ? "_blank" : null, rel: block.link.newTab ? "noopener" : null });
+    const a = el("a");
+    applyLink(a, block.link, mediaMap);
     figure.appendChild(a);
     imgHolder = a;
   }
   const img = el("img", null, {
-    src: block.url,
-    alt: block.alt || "",
+    src: media.url,
+    alt: block.alt || media.alt || "",
     loading: "lazy",
-    width: block.naturalWidth || null,
-    height: block.naturalHeight || null,
+    width: media.width || null,
+    height: media.height || null,
   });
   imgHolder.appendChild(img);
   if (block.caption) {
@@ -85,22 +138,21 @@ function renderImageBlock(block) {
   return figure;
 }
 
-function renderGalleryBlock(block) {
+function renderGalleryBlock(block, mediaMap) {
   const grid = el("div", "block-gallery");
-  (block.images || []).forEach((image) => {
-    const img = el("img", null, { src: image.url, alt: image.alt || "", loading: "lazy" });
+  (block.images || []).forEach((entry) => {
+    const media = mediaMap[entry.mediaId];
+    if (!media) return;
+    const img = el("img", null, { src: media.url, alt: entry.alt || media.alt || "", loading: "lazy" });
     grid.appendChild(img);
   });
   return grid;
 }
 
-function renderButtonBlock(block) {
+function renderButtonBlock(block, mediaMap) {
   const wrap = el("div", `block-button align-${block.align || "left"}`);
-  const a = el("a", `btn ${block.style === "outline" ? "btn--outline" : ""}`.trim(), {
-    href: resolveLink(block.link),
-    target: block.link?.newTab ? "_blank" : null,
-    rel: block.link?.newTab ? "noopener" : null,
-  });
+  const a = el("a", `btn ${block.style === "outline" ? "btn--outline" : ""}`.trim());
+  applyLink(a, block.link, mediaMap);
   a.textContent = block.text || "Klik hier";
   wrap.appendChild(a);
   return wrap;
@@ -114,15 +166,22 @@ function formatFileSize(bytes) {
   return `${value.toFixed(value < 10 && i > 0 ? 1 : 0)} ${units[i]}`;
 }
 
-function renderFileBlock(block) {
-  const a = el("a", "block-file", { href: block.url, target: "_blank", rel: "noopener" });
+function renderFileBlock(block, mediaMap) {
+  const media = mediaMap[block.mediaId];
+  if (!media) {
+    const p = document.createElement("p");
+    p.className = "state-message";
+    p.textContent = "Bestand niet gevonden.";
+    return p;
+  }
+  const a = el("a", "block-file", { href: media.url, download: media.name || "bestand" });
   const icon = el("span", "block-file__icon");
   icon.textContent = "📄";
   const textWrap = el("span");
   const name = el("span", "block-file__name");
-  name.textContent = block.label || block.name || "Bekijk het document";
+  name.textContent = block.label || media.name || "Bekijk het document";
   const meta = el("span", "block-file__meta");
-  meta.textContent = [block.fileType, formatFileSize(block.size)].filter(Boolean).join(" · ");
+  meta.textContent = [media.contentType, formatFileSize(media.size)].filter(Boolean).join(" · ");
   textWrap.appendChild(name);
   textWrap.appendChild(meta);
   a.appendChild(icon);
@@ -153,11 +212,11 @@ function renderSpacerBlock(block) {
   return spacer;
 }
 
-function renderColumnsBlock(block) {
+function renderColumnsBlock(block, mediaMap) {
   const wrap = el("div", "block-columns", { "data-columns": block.columns || 2 });
   (block.items || []).forEach((columnBlocks) => {
     const col = el("div", "block-column");
-    renderBlocks(columnBlocks || [], col);
+    renderBlocks(columnBlocks || [], col, mediaMap);
     wrap.appendChild(col);
   });
   return wrap;
@@ -182,7 +241,7 @@ function renderFaqBlock(block) {
     const summary = document.createElement("summary");
     summary.textContent = item.question || "";
     const answer = document.createElement("div");
-    answer.innerHTML = sanitize(item.answer || "");
+    answer.textContent = item.answer || "";
     details.appendChild(summary);
     details.appendChild(answer);
     wrap.appendChild(details);
@@ -190,7 +249,7 @@ function renderFaqBlock(block) {
   return wrap;
 }
 
-function renderHeroBlock(block) {
+function renderHeroBlock(block, mediaMap) {
   const section = el("section", "hero");
   const inner = el("div", "hero__inner");
   const textCol = el("div", "hero__text");
@@ -208,14 +267,16 @@ function renderHeroBlock(block) {
     textCol.appendChild(lead);
   }
   if (block.buttonText && block.buttonLink) {
-    const a = el("a", "btn", { href: resolveLink(block.buttonLink) });
+    const a = el("a", "btn");
+    applyLink(a, block.buttonLink, mediaMap);
     a.textContent = block.buttonText;
     textCol.appendChild(a);
   }
   inner.appendChild(textCol);
-  if (block.imageUrl) {
+  const media = mediaMap[block.imageMediaId];
+  if (media) {
     const imgWrap = el("div", "hero__image");
-    const img = el("img", null, { src: block.imageUrl, alt: block.imageAlt || "" });
+    const img = el("img", null, { src: media.url, alt: block.imageAlt || media.alt || "" });
     imgWrap.appendChild(img);
     inner.appendChild(imgWrap);
   }
@@ -246,7 +307,7 @@ function renderContactFormBlock(block) {
   return wrap;
 }
 
-function renderTilesBlock(block) {
+function renderTilesBlock(block, mediaMap) {
   const grid = el("div", "tile-grid");
   (block.items || []).forEach((item) => {
     const tile = el("div", "tile");
@@ -257,7 +318,8 @@ function renderTilesBlock(block) {
     tile.appendChild(h3);
     tile.appendChild(p);
     if (item.link && item.link.value) {
-      const a = el("a", null, { href: resolveLink(item.link) });
+      const a = el("a");
+      applyLink(a, item.link, mediaMap);
       a.textContent = "Lees verder";
       tile.appendChild(a);
     }
@@ -284,17 +346,44 @@ const RENDERERS = {
   faq: renderFaqBlock,
 };
 
-export function renderBlocks(blocks, container) {
+/**
+ * @param {Array} blocks
+ * @param {HTMLElement} container
+ * @param {Object} mediaMap - { [mediaId]: {url, name, contentType, size, alt, width, height} }, van tevoren opgehaald met fetchMediaMap()
+ */
+export function renderBlocks(blocks, container, mediaMap = {}) {
   container.innerHTML = "";
   (blocks || []).forEach((block) => {
     const renderer = RENDERERS[block.type];
     if (!renderer) return;
     try {
-      container.appendChild(renderer(block));
+      container.appendChild(renderer(block, mediaMap));
     } catch (err) {
       console.error("Kon blok niet renderen:", block, err);
     }
   });
+}
+
+/** Verzamelt recursief alle mediaId's waar een blokken-array naar verwijst (incl. binnen kolommen en rijke tekst). */
+export function collectMediaIds(blocks, ids = new Set()) {
+  (blocks || []).forEach((block) => {
+    if (block.mediaId) ids.add(block.mediaId);
+    if (block.imageMediaId) ids.add(block.imageMediaId);
+    if (block.link?.type === "file" && block.link.value) ids.add(block.link.value);
+    if (block.buttonLink?.type === "file" && block.buttonLink.value) ids.add(block.buttonLink.value);
+    if (Array.isArray(block.images)) block.images.forEach((img) => { if (img.mediaId) ids.add(img.mediaId); });
+    if (block.type === "tiles" && Array.isArray(block.items)) {
+      block.items.forEach((item) => { if (item.link?.type === "file" && item.link.value) ids.add(item.link.value); });
+    }
+    if (block.type === "columns" && Array.isArray(block.items)) {
+      block.items.forEach((columnBlocks) => collectMediaIds(columnBlocks, ids));
+    }
+    if (block.type === "text" && block.html) {
+      const matches = block.html.matchAll(/href="media:([^"]+)"/g);
+      for (const m of matches) ids.add(m[1]);
+    }
+  });
+  return ids;
 }
 
 export { resolveLink };
