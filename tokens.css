@@ -1,0 +1,126 @@
+/*
+  tokens.css
+  Design tokens (kleuren, typografie, ruimte) voor de website van Christine ten Kate.
+  Pas deze waarden aan om de complete uitstraling van de site te wijzigen.
+*/
+
+:root {
+  /* --- Kleuren --- */
+  --color-bg:            #FBF9F4;   /* warm papierwit, hoofdachtergrond */
+  --color-bg-soft:       #F1ECDF;   /* iets donkerder, voor secties */
+  --color-ink:           #1F2E27;   /* bijna-zwart, groen ondertoon — hoofdtekst */
+  --color-ink-soft:      #4B5D54;   /* gedempte tekst, bijschriften */
+  --color-primary:       #2F4A3E;   /* dennengroen — koppen, knoppen, nav */
+  --color-primary-dark:  #1D2F27;
+  --color-accent:        #E2963F;   /* warm goudoranje — accenten, links, hover */
+  --color-accent-soft:   #F4D9AE;
+  --color-teal:          #4A7A72;   /* gedempt teal — tweede accent */
+  --color-line:          #DCD5C3;   /* randen/scheidingslijnen */
+  --color-white:         #FFFFFF;
+  --color-error:         #B3432B;
+  --color-success:       #3E6B4F;
+
+  /* --- Typografie --- */
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Work Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --fs-xs:   0.8rem;
+  --fs-sm:   0.9rem;
+  --fs-base: 1rem;
+  --fs-md:   1.15rem;
+  --fs-lg:   1.4rem;
+  --fs-xl:   1.9rem;
+  --fs-2xl:  2.6rem;
+  --fs-3xl:  3.4rem;
+
+  /* --- Ruimte --- */
+  --space-1: 0.4rem;
+  --space-2: 0.8rem;
+  --space-3: 1.4rem;
+  --space-4: 2.2rem;
+  --space-5: 3.4rem;
+  --space-6: 5.2rem;
+
+  /* --- Overig --- */
+  --radius-sm: 6px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --max-width: 1180px;
+  --shadow-soft: 0 1px 3px rgba(31, 46, 39, 0.08);
+  --shadow-md: 0 8px 24px rgba(31, 46, 39, 0.10);
+  --shadow-lg: 0 20px 48px rgba(31, 46, 39, 0.14);
+  --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  color: var(--color-ink);
+  background: var(--color-bg);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--color-primary);
+  line-height: 1.15;
+  margin: 0 0 var(--space-2);
+  font-weight: 600;
+}
+
+h1 { font-size: var(--fs-3xl); }
+h2 { font-size: var(--fs-2xl); }
+h3 { font-size: var(--fs-xl); }
+h4 { font-size: var(--fs-lg); }
+h5 { font-size: var(--fs-md); }
+h6 { font-size: var(--fs-base); }
+
+p { margin: 0 0 var(--space-3); max-width: 68ch; }
+
+a {
+  color: var(--color-accent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+a:hover { color: var(--color-primary); }
+
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--color-teal);
+  outline-offset: 2px;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+@media (max-width: 640px) {
+  h1 { font-size: 2.2rem; }
+  h2 { font-size: 1.8rem; }
+  .container { padding: 0 var(--space-3); }
+}

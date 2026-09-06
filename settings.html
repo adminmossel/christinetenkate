@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Instellingen — Beheer</title>
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/admin/css/admin.css" />
+  <link rel="stylesheet" href="/admin/css/admin-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="admin">
+  <div id="admin-main-content">
+    <div class="admin-header">
+      <div>
+        <h1>Instellingen</h1>
+        <p style="color:var(--color-ink-soft);">Algemene gegevens die overal op de site gebruikt worden (footer, contactgegevens).</p>
+      </div>
+      <button class="btn-admin btn-admin--primary" id="save-settings-btn">Opslaan</button>
+    </div>
+
+    <div class="admin-card">
+      <h3>Algemeen</h3>
+      <div class="admin-field"><label>Sitenaam</label><input type="text" id="s-siteName"></div>
+      <div class="admin-field"><label>Logo-tekst (gebruikt als er geen logo-afbeelding is ingesteld; mag simpele HTML bevatten)</label><input type="text" id="s-logoText"></div>
+      <div class="admin-field"><label>Korte tekst in de footer</label><textarea id="s-footerText" rows="2"></textarea></div>
+    </div>
+
+    <div class="admin-card">
+      <h3>Kleuren</h3>
+      <p style="font-size:var(--fs-sm);color:var(--color-ink-soft);">Past de kleuren van de PUBLIEKE website aan (niet van dit admin-paneel zelf).</p>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        <div class="admin-field" style="width:auto;">
+          <label>Hoofdkleur (koppen, knoppen, menu)</label>
+          <input type="color" id="c-primary" style="width:70px;height:40px;padding:2px;">
+        </div>
+        <div class="admin-field" style="width:auto;">
+          <label>Accentkleur (links, hover)</label>
+          <input type="color" id="c-accent" style="width:70px;height:40px;padding:2px;">
+        </div>
+        <div class="admin-field" style="width:auto;">
+          <label>Achtergrondkleur</label>
+          <input type="color" id="c-bg" style="width:70px;height:40px;padding:2px;">
+        </div>
+      </div>
+      <button type="button" class="btn-admin" id="reset-colors-btn">Terugzetten naar standaardkleuren</button>
+    </div>
+
+    <div class="admin-card">
+      <h3>Huisstijl</h3>
+      <div class="admin-field">
+        <label>Logo (afbeelding, wordt bovenaan elke pagina getoond)</label>
+        <div id="logo-preview-wrap"></div>
+        <button type="button" class="btn-admin" id="pick-logo-btn">Logo kiezen / wijzigen</button>
+      </div>
+      <div class="admin-field">
+        <label>Keurmerk / badge in de footer (optioneel)</label>
+        <div id="badge-preview-wrap"></div>
+        <button type="button" class="btn-admin" id="pick-badge-btn">Badge kiezen / wijzigen</button>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <h3>Contactgegevens</h3>
+      <div class="admin-field"><label>Adres</label><textarea id="s-address" rows="2"></textarea></div>
+      <div class="admin-field"><label>Telefoonnummer (vast)</label><input type="text" id="s-phone"></div>
+      <div class="admin-field"><label>Telefoonnummer (mobiel)</label><input type="text" id="s-mobilePhone"></div>
+      <div class="admin-field"><label>E-mailadres</label><input type="email" id="s-email"></div>
+      <div class="admin-field"><label>KvK-nummer</label><input type="text" id="s-kvk"></div>
+    </div>
+
+    <div class="admin-card">
+      <h3>Sociale media</h3>
+      <div id="social-links-list"></div>
+      <button class="btn-admin" id="add-social-btn">+ Link toevoegen</button>
+    </div>
+  </div>
+  <script type="module" src="/admin/js/settings.js"></script>
+</body>
+</html>

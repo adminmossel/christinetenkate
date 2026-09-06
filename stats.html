@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Statistieken — Beheer</title>
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/admin/css/admin.css" />
+  <link rel="stylesheet" href="/admin/css/admin-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="admin">
+  <div id="admin-main-content">
+    <div class="admin-header">
+      <div>
+        <h1>Statistieken</h1>
+        <p>Bezoeken van de afgelopen periode. Er wordt bewust geen IP-adres bewaard, alleen een geschatte plaats/land.</p>
+      </div>
+    </div>
+
+    <div class="stats-cards">
+      <div class="admin-card stats-card">
+        <span class="stats-card__label">Vandaag</span>
+        <span class="stats-card__value" id="stat-today">—</span>
+      </div>
+      <div class="admin-card stats-card">
+        <span class="stats-card__label">Laatste 7 dagen</span>
+        <span class="stats-card__value" id="stat-7d">—</span>
+      </div>
+      <div class="admin-card stats-card">
+        <span class="stats-card__label">Laatste 30 dagen</span>
+        <span class="stats-card__value" id="stat-30d">—</span>
+      </div>
+      <div class="admin-card stats-card">
+        <span class="stats-card__label">Totaal (alle tijd)</span>
+        <span class="stats-card__value" id="stat-total">—</span>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <h3>Bezoeken per dag (laatste 14 dagen)</h3>
+      <div id="stat-daily-chart" class="daily-chart"><p style="font-size:var(--fs-sm);color:var(--color-ink-soft);">Wordt geladen…</p></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="admin-card">
+        <h3>Meest bezochte pagina's</h3>
+        <div id="stat-top-pages"><p style="font-size:var(--fs-sm);color:var(--color-ink-soft);">Wordt geladen…</p></div>
+      </div>
+      <div class="admin-card">
+        <h3>Waar bezoekers vandaan komen</h3>
+        <div id="stat-top-locations"><p style="font-size:var(--fs-sm);color:var(--color-ink-soft);">Wordt geladen…</p></div>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <h3>Apparaat &amp; browser</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div id="stat-devices"></div>
+        <div id="stat-browsers"></div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/admin/js/stats.js"></script>
+</body>
+</html>
