@@ -1,5 +1,7 @@
 # Website van Christine ten Kate — technische documentatie
 
+let op public/js/firebase-config.js
+
 Volledig gratis te hosten website met een eigen visuele CMS-editor, gebouwd
 in vanilla HTML/CSS/JavaScript op Firebase (gratis Spark-plan, geen
 creditcard) en Cloudflare Workers static assets (gratis).
