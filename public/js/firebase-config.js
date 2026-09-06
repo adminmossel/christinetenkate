@@ -6,7 +6,7 @@
 //
 // Zie INSTALLATIE.md stap "Firebase-configuratie toevoegen" voor de volledige uitleg.
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyATboS6Da0ukExPvv5l1gyCQoRJb4JUarw",
   authDomain: "christinetenkate-website.firebaseapp.com",
   projectId: "christinetenkate-website",
