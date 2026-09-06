@@ -73,5 +73,16 @@ service cloud.firestore {
         && request.resource.data.read == false;
       allow read, update, delete: if isAdmin();
     }
+    // ---- visits (bezoekstatistieken) ----
+    // Zelfde patroon als "submissions": iedereen mag een bezoek
+    // registreren, niemand behalve een beheerder mag de statistieken
+    // uitlezen. Er wordt bewust geen IP-adres opgeslagen (zie
+    // public/js/analytics.js) — alleen geschatte plaats/land, apparaattype
+    // en welke pagina bezocht is.
+    match /visits/{visitId} {
+      allow create: if request.resource.data.keys().hasOnly(['path','referrer','device','browser','city','region','country','createdAt'])
+        && request.resource.data.path is string && request.resource.data.path.size() <= 300;
+      allow read, update, delete: if isAdmin();
+    }
   }
 }

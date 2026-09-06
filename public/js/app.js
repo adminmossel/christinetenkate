@@ -19,6 +19,7 @@ import { renderBlocks, collectMediaIds } from "./render.js";
 import { fetchMediaMap } from "../admin/js/media-picker.js";
 import { initContactForms } from "./contact-form.js";
 import { initCookieBanner } from "./cookie-banner.js";
+import { trackVisit } from "./analytics.js";
 
 function currentSlug() {
   const path = location.pathname.replace(/^\/|\/$/g, "");
@@ -105,5 +106,6 @@ async function loadPage() {
 // pagina heel even in de standaardkleuren.
 await initLayout();
 initCookieBanner();
+trackVisit();
 loadPage();
 

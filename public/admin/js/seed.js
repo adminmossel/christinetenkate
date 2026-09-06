@@ -44,6 +44,8 @@ const MENU = {
 function placeholderNotice(text) {
   return paragraph(`<em>${text}</em>`);
 }
+function faq(items) { return { id: bid(), type: "faq", items }; }
+function tilesBlock(items) { return { id: bid(), type: "tiles", items }; }
 
 const PAGES = [
   {
@@ -74,11 +76,27 @@ const PAGES = [
   {
     slug: "even-voorstellen",
     title: "Even voorstellen",
-    seo: { title: "Even voorstellen — Christine ten Kate", description: "Maak kennis met Christine ten Kate.", ogImage: "" },
+    seo: { title: "Even voorstellen — Christine ten Kate", description: "Maak kennis met Christine ten Kate, trainer, docent en pedagogisch adviseur.", ogImage: "" },
     blocks: [
       heading("Even voorstellen", 1),
-      placeholderNotice("Plaatshouder-tekst — pas dit aan via de editor met jouw eigen verhaal, foto en achtergrond."),
-      paragraph("Vertel hier wie je bent, wat je drijft en hoe je te werk gaat. Je kunt hieronder eenvoudig een foto toevoegen via het '+ Blok'-menu."),
+      placeholderNotice("Plaatshouder-tekst — vervang dit hele verhaal door jouw eigen achtergrond, foto's en werkwijze. De structuur (kopjes) kun je gewoon laten staan als hij bevalt."),
+      paragraph("Graag stel ik mezelf voor: ik ben trainer, docent en pedagogisch adviseur en werk al jarenlang met veel plezier voor organisaties in de kinderopvang. Mijn drijfveer is simpel — ik wil dat pedagogisch medewerkers zich zeker en vaardig voelen in hun dagelijkse werk met kinderen, en dat teams elkaar daarin versterken."),
+      heading("Mijn achtergrond", 2),
+      paragraph("Beschrijf hier je opleiding, werkervaring en de organisaties waar je eerder voor gewerkt hebt. Noem gerust relevante certificeringen of registraties (zoals het CRKBO-keurmerk dat al in de footer van de site staat)."),
+      heading("Mijn werkwijze", 2),
+      paragraph("Leg hier uit hoe een traject er bij jou uitziet: begin je altijd met een intakegesprek? Werk je met vaste modules of maatwerk? Sta je ook na afloop van een training nog beschikbaar voor vragen?"),
+      { id: bid(), type: "columns", columns: 2, items: [
+        [paragraph("<strong>Praktisch</strong>")],
+        [paragraph("<strong>Persoonlijk</strong>")],
+      ] },
+      divider(),
+      heading("In het kort", 3),
+      { id: bid(), type: "text", html: `<ul>
+        <li>Jarenlange ervaring in de kinderopvangsector;</li>
+        <li>CRKBO-geregistreerd docent;</li>
+        <li>Werkzaam als trainer, docent én pedagogisch adviseur;</li>
+        <li>Persoonlijke, praktijkgerichte aanpak.</li>
+      </ul>` },
     ],
   },
   {
@@ -87,8 +105,21 @@ const PAGES = [
     seo: { title: "Cursussen & workshops — Christine ten Kate", description: "Trainingen en workshops voor pedagogisch medewerkers in de kinderopvang.", ogImage: "" },
     blocks: [
       heading("Cursussen & workshops voor pedagogisch medewerkers", 1),
-      placeholderNotice("Plaatshouder-tekst — vul hier het actuele aanbod aan cursussen en workshops in, eventueel met een 'Vraag & antwoord'-blok voor veelgestelde vragen."),
-      paragraph("Beschrijf hier per cursus of workshop de inhoud, duur en doelgroep."),
+      placeholderNotice("Plaatshouder-tekst — vul hier het actuele aanbod aan cursussen en workshops in. De voorbeeldtegels en -vragen hieronder laten zien hoe je dat overzichtelijk kunt opbouwen; pas titels en teksten aan naar je eigen aanbod."),
+      paragraph("Ik verzorg trainingen en workshops die direct aansluiten bij de dagelijkse praktijk van pedagogisch medewerkers. Hieronder een voorbeeld van hoe je jouw aanbod kunt presenteren."),
+      tilesBlock([
+        { title: "Basistraining pedagogisch handelen", text: "Voorbeeld — korte omschrijving van inhoud, duur en doelgroep.", link: null },
+        { title: "Werken met baby's en dreumesen", text: "Voorbeeld — korte omschrijving van inhoud, duur en doelgroep.", link: null },
+        { title: "Omgaan met grensoverschrijdend gedrag", text: "Voorbeeld — korte omschrijving van inhoud, duur en doelgroep.", link: null },
+      ]),
+      heading("Hoe een training eruitziet", 2),
+      paragraph("Beschrijf hier de opbouw van een gemiddelde training: duur, groepsgrootte, locatie (op locatie bij de organisatie, of elders), en of er een certificaat/bewijs van deelname wordt uitgereikt."),
+      heading("Veelgestelde vragen", 2),
+      faq([
+        { question: "Voor wie zijn de trainingen bedoeld?", answer: "Voorbeeldantwoord — bijvoorbeeld: voor pedagogisch medewerkers, teamleiders en locatiemanagers in de kinderopvang." },
+        { question: "Kan een training op maat gemaakt worden?", answer: "Voorbeeldantwoord — leg hier uit of en hoe trainingen aangepast worden aan de wensen van een organisatie." },
+        { question: "Wat zijn de kosten?", answer: "Voorbeeldantwoord — vul hier je tarieven of prijsindicatie in, of verwijs naar een offerte op maat." },
+      ]),
     ],
   },
   {
@@ -97,8 +128,19 @@ const PAGES = [
     seo: { title: "Ouderavonden — Christine ten Kate", description: "Interactieve ouderavonden verzorgd door Christine ten Kate.", ogImage: "" },
     blocks: [
       heading("Ouderavonden", 1),
-      placeholderNotice("Plaatshouder-tekst — beschrijf hier het aanbod en de werkwijze rondom ouderavonden."),
-      paragraph("Vertel hier meer over de opzet, onderwerpen en aanpak van de ouderavonden die je verzorgt."),
+      placeholderNotice("Plaatshouder-tekst — beschrijf hier het aanbod en de werkwijze rondom ouderavonden. Vul de voorbeeldonderwerpen hieronder aan met jouw eigen thema's."),
+      paragraph("Naast trainingen voor pedagogisch medewerkers verzorg ik ook interactieve ouderavonden. Deze avonden zijn bedoeld om ouders en het team samen in gesprek te laten gaan over de ontwikkeling en opvoeding van kinderen."),
+      heading("Mogelijke onderwerpen", 2),
+      { id: bid(), type: "text", html: `<ul>
+        <li>Voorbeeldonderwerp — gehechtheid en een veilige basis;</li>
+        <li>Voorbeeldonderwerp — grenzen stellen op een positieve manier;</li>
+        <li>Voorbeeldonderwerp — de overstap naar de basisschool;</li>
+        <li>Voorbeeldonderwerp — schermgebruik en jonge kinderen.</li>
+      </ul>` },
+      heading("Werkwijze", 2),
+      paragraph("Beschrijf hier hoe een ouderavond eruitziet: duur, interactieve werkvormen, en of de avond samen met het team wordt voorbereid."),
+      spacer(10),
+      quote("Voorbeeldcitaat van een organisatie die een ouderavond heeft afgenomen.", "Voorbeeld — naam organisatie"),
     ],
   },
   {
@@ -107,17 +149,34 @@ const PAGES = [
     seo: { title: "Referenties — Christine ten Kate", description: "Ervaringen van eerdere opdrachtgevers van Christine ten Kate.", ogImage: "" },
     blocks: [
       heading("Referenties", 1),
-      placeholderNotice("Plaatshouder — vervang dit voorbeeldcitaat door echte reacties van opdrachtgevers."),
-      quote("Een fijne, deskundige trainer die goed aansluit bij de praktijk.", "Voorbeeld — naam opdrachtgever"),
+      placeholderNotice("Plaatshouder — vervang deze voorbeeldcitaten door échte reacties van opdrachtgevers (met hun toestemming)."),
+      paragraph("Hieronder een aantal reacties van organisaties waarmee ik heb samengewerkt."),
+      quote("Een fijne, deskundige trainer die goed aansluit bij de praktijk.", "Voorbeeld — naam opdrachtgever, kinderdagverblijf"),
+      quote("De training was praktisch, interactief en direct toepasbaar op de groep.", "Voorbeeld — naam opdrachtgever, BSO"),
+      quote("Prettige samenwerking van intake tot evaluatie.", "Voorbeeld — naam opdrachtgever, peuterspeelzaal"),
+      divider(),
+      heading("Eerdere opdrachtgevers", 2),
+      paragraph("Voorbeeldtekst — noem hier (met toestemming) de namen of logo's van organisaties waarvoor je gewerkt hebt, bijvoorbeeld via een galerij-blok."),
     ],
   },
   {
     slug: "handige-links",
     title: "Handige links",
-    seo: { title: "Handige links — Christine ten Kate", description: "Handige links voor pedagogisch medewerkers.", ogImage: "" },
+    seo: { title: "Handige links — Christine ten Kate", description: "Handige links voor pedagogisch medewerkers en ouders.", ogImage: "" },
     blocks: [
       heading("Handige links", 1),
-      placeholderNotice("Plaatshouder — voeg hier links toe naar handige websites, met de knop 'Link instellen' bij een tekst- of knopblok."),
+      placeholderNotice("Plaatshouder — voeg hier links toe naar handige, betrouwbare websites voor pedagogisch medewerkers en ouders. Gebruik bij een tekst- of knopblok de knop 'Link instellen' om naar een externe site te linken."),
+      heading("Voor pedagogisch medewerkers", 2),
+      { id: bid(), type: "text", html: `<ul>
+        <li>Voorbeeldlink — brancheorganisatie kinderopvang;</li>
+        <li>Voorbeeldlink — kennisplatform pedagogiek;</li>
+        <li>Voorbeeldlink — CRKBO-register.</li>
+      </ul>` },
+      heading("Voor ouders", 2),
+      { id: bid(), type: "text", html: `<ul>
+        <li>Voorbeeldlink — informatie over de ontwikkeling van jonge kinderen;</li>
+        <li>Voorbeeldlink — opvoedadvies.</li>
+      </ul>` },
     ],
   },
   {
@@ -126,10 +185,11 @@ const PAGES = [
     seo: { title: "Contact — Christine ten Kate", description: "Neem contact op met Christine ten Kate.", ogImage: "" },
     blocks: [
       heading("Contact", 1),
-      paragraph("Neem gerust contact op via onderstaand formulier, telefoon of e-mail."),
-      paragraph("<strong>Christine ten Kate</strong><br>Zuiderlaan 199<br>7944 EE Meppel<br>T 0522 - 24 43 66<br>M 06 - 30 86 09 63<br>E info@christinetenkate.nl<br>KvK-nr. 60855851"),
-      divider(),
-      { id: bid(), type: "contact-form", buttonText: "Versturen" },
+      paragraph("Neem gerust contact op via onderstaand formulier, telefoon of e-mail — ik reageer meestal binnen enkele werkdagen."),
+      { id: bid(), type: "columns", columns: 2, items: [
+        [paragraph("<strong>Christine ten Kate</strong><br>Zuiderlaan 199<br>7944 EE Meppel<br>T 0522 - 24 43 66<br>M 06 - 30 86 09 63<br>E info@christinetenkate.nl<br>KvK-nr. 60855851")],
+        [{ id: bid(), type: "contact-form", buttonText: "Versturen" }],
+      ] },
     ],
   },
   {
@@ -138,7 +198,21 @@ const PAGES = [
     seo: { title: "Algemene voorwaarden — Christine ten Kate", description: "Algemene voorwaarden van Christine ten Kate.", ogImage: "" },
     blocks: [
       heading("Algemene voorwaarden", 1),
-      placeholderNotice("Plaatshouder — de eerdere algemene voorwaarden waren niet aangeleverd. Vul hier de geldende algemene voorwaarden in."),
+      placeholderNotice("Plaatshouder — de eerdere algemene voorwaarden waren niet aangeleverd (en die mag ik niet zomaar overnemen van de oude site). De kopjes hieronder zijn een gebruikelijke opzet voor algemene voorwaarden van een trainingsbureau/zzp'er; vul ze aan met je eigen, geldende voorwaarden of laat ze controleren door een jurist/brancheorganisatie."),
+      heading("1. Toepasselijkheid", 2),
+      paragraph("Voorbeeldtekst — beschrijf hier op welke overeenkomsten deze voorwaarden van toepassing zijn."),
+      heading("2. Offertes en totstandkoming overeenkomst", 2),
+      paragraph("Voorbeeldtekst — beschrijf hier hoe een offerte/opdracht tot stand komt."),
+      heading("3. Uitvoering van de opdracht", 2),
+      paragraph("Voorbeeldtekst — beschrijf hier de wijze van uitvoering, planning en eventuele wijzigingen."),
+      heading("4. Betaling", 2),
+      paragraph("Voorbeeldtekst — beschrijf hier de betalingstermijn en -voorwaarden."),
+      heading("5. Annulering", 2),
+      paragraph("Voorbeeldtekst — beschrijf hier het annuleringsbeleid, eventueel met termijnen en kosten."),
+      heading("6. Aansprakelijkheid", 2),
+      paragraph("Voorbeeldtekst — beschrijf hier de aansprakelijkheidsbeperking."),
+      heading("7. Geschillen en toepasselijk recht", 2),
+      paragraph("Voorbeeldtekst — beschrijf hier welk recht van toepassing is en hoe geschillen worden behandeld."),
     ],
   },
   {

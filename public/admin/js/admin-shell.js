@@ -5,6 +5,7 @@ import { logout } from "./admin-auth.js";
 
 const ICONS = {
   dashboard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>`,
+  stats: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
   media: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5.5-5.5a2 2 0 0 0-2.8 0L3 20"/></svg>`,
   menu: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg>`,
   messages: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
@@ -14,30 +15,42 @@ const ICONS = {
 
 const NAV_ITEMS = [
   { key: "dashboard", label: "Pagina's", href: "/admin/index.html" },
+  { key: "stats", label: "Statistieken", href: "/admin/stats.html" },
   { key: "media", label: "Mediabibliotheek", href: "/admin/media.html" },
   { key: "menu", label: "Menu", href: "/admin/menu.html" },
   { key: "messages", label: "Berichten", href: "/admin/messages.html" },
   { key: "settings", label: "Instellingen", href: "/admin/settings.html" },
 ];
 
-export function renderAdminShell(activeKey, adminProfile) {
+export function renderAdminShell(activeKey, adminProfile, options = {}) {
   document.body.classList.add("admin");
   const shell = document.createElement("div");
   shell.className = "admin-shell";
 
+  const collapsed = options.collapsedByDefault ?? (localStorage.getItem("admin-sidebar-collapsed") === "true");
+  if (collapsed) shell.classList.add("is-sidebar-collapsed");
+
   const sidebar = document.createElement("aside");
   sidebar.className = "admin-sidebar";
   sidebar.innerHTML = `
-    <a class="admin-sidebar__logo" href="/">Christine ten Kate</a>
+    <button type="button" class="admin-sidebar__collapse-btn" aria-label="Menu in-/uitklappen" title="Menu in-/uitklappen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <a class="admin-sidebar__logo" href="/"><span class="admin-sidebar__logo-full">Christine ten Kate</span><span class="admin-sidebar__logo-mini">CtK</span></a>
     <nav>
-      ${NAV_ITEMS.map((item) => `<a href="${item.href}" class="${item.key === activeKey ? "is-active" : ""}">${ICONS[item.key]}<span>${item.label}</span></a>`).join("")}
-      <a href="/" target="_blank" rel="noopener">${ICONS.external}<span>Bekijk site</span></a>
+      ${NAV_ITEMS.map((item) => `<a href="${item.href}" class="${item.key === activeKey ? "is-active" : ""}" title="${item.label}">${ICONS[item.key]}<span>${item.label}</span></a>`).join("")}
+      <a href="/" target="_blank" rel="noopener" title="Bekijk site">${ICONS.external}<span>Bekijk site</span></a>
     </nav>
     <div class="admin-sidebar__user">
       <p>${adminProfile?.name || adminProfile?.email || ""}</p>
       <button type="button" id="logout-btn">Uitloggen</button>
     </div>
   `;
+
+  sidebar.querySelector(".admin-sidebar__collapse-btn").addEventListener("click", () => {
+    const isNowCollapsed = shell.classList.toggle("is-sidebar-collapsed");
+    localStorage.setItem("admin-sidebar-collapsed", String(isNowCollapsed));
+  });
 
   const main = document.createElement("main");
   main.className = "admin-main";

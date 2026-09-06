@@ -22,7 +22,7 @@ let currentTab = "edit";
 async function boot() {
   if (!pageId) { alert("Geen pagina-id opgegeven."); location.href = "/admin/index.html"; return; }
   const admin = await requireAdmin();
-  const main = renderAdminShell("dashboard", admin);
+  const main = renderAdminShell("dashboard", admin, { collapsedByDefault: true });
   main.classList.add("admin-main--wide");
 
   const snap = await getDoc(doc(db, "pages", pageId));
@@ -39,33 +39,34 @@ async function boot() {
 
 function renderShell(main) {
   main.innerHTML = `
-    <div class="admin-header">
-      <div style="flex:1;">
-        <input id="page-title-input" type="text" value="${escapeAttr(pageData.title)}"
-          style="font-family:var(--font-display);font-size:var(--fs-xl);border:none;background:none;width:100%;color:var(--color-primary);">
-        <div style="display:flex;align-items:center;gap:6px;color:var(--color-ink-soft);font-size:var(--fs-sm);">
-          <span>${new URL(location.origin).hostname}/</span>
-          <input id="page-slug-input" type="text" value="${escapeAttr(pageData.slug)}" style="border:1px solid var(--color-line);border-radius:4px;padding:2px 6px;">
+    <div class="editor-topbar">
+      <div class="admin-header" style="margin-bottom:var(--space-3);">
+        <div style="flex:1;">
+          <input id="page-title-input" type="text" value="${escapeAttr(pageData.title)}"
+            style="font-family:var(--font-display);font-size:var(--fs-xl);border:none;background:none;width:100%;color:var(--color-primary);">
+          <div style="display:flex;align-items:center;gap:6px;color:var(--color-ink-soft);font-size:var(--fs-sm);">
+            <span>${new URL(location.origin).hostname}/</span>
+            <input id="page-slug-input" type="text" value="${escapeAttr(pageData.slug)}" style="border:1px solid var(--color-line);border-radius:4px;padding:2px 6px;">
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span id="autosave-indicator" style="font-size:var(--fs-sm);color:var(--color-ink-soft);"></span>
+          <span class="status-pill status-pill--${pageData.status}" id="status-pill">${pageData.status === "published" ? "Gepubliceerd" : "Concept"}</span>
+          <button class="btn-admin" id="save-draft-btn">Concept opslaan</button>
+          <button class="btn-admin btn-admin--primary" id="publish-btn">Publiceren</button>
         </div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <span id="autosave-indicator" style="font-size:var(--fs-sm);color:var(--color-ink-soft);"></span>
-        <span class="status-pill status-pill--${pageData.status}" id="status-pill">${pageData.status === "published" ? "Gepubliceerd" : "Concept"}</span>
-        <button class="btn-admin" id="save-draft-btn">Concept opslaan</button>
-        <button class="btn-admin btn-admin--primary" id="publish-btn">Publiceren</button>
-      </div>
-    </div>
 
-    <div class="editor-tabs">
-      <button type="button" class="is-active" data-tab="edit">Bewerken</button>
-      <button type="button" data-tab="preview">Voorbeeld</button>
+      <div class="editor-tabs">
+        <button type="button" class="is-active" data-tab="edit">Bewerken</button>
+        <button type="button" data-tab="preview">Voorbeeld</button>
+      </div>
     </div>
 
     <div class="editor-shell">
       <div class="editor-canvas" id="editor-canvas"></div>
       <div class="editor-sidebar">
-        <div class="admin-card">
-          <h3>SEO</h3>
+        ${collapsiblePanel("seo-panel", "SEO", true, `
           <div class="admin-field">
             <label>SEO-titel</label>
             <input id="seo-title" type="text" value="${escapeAttr(pageData.seo.title)}">
@@ -74,15 +75,21 @@ function renderShell(main) {
             <label>Meta-omschrijving</label>
             <textarea id="seo-description" rows="3">${pageData.seo.description || ""}</textarea>
           </div>
-        </div>
-        <div class="admin-card">
-          <h3>Versiegeschiedenis</h3>
+        `)}
+        ${collapsiblePanel("versions-panel", "Versiegeschiedenis", false, `
           <div id="version-list"><p style="font-size:var(--fs-sm);color:var(--color-ink-soft);">Wordt geladen…</p></div>
           <button class="btn-admin" id="save-version-btn" style="margin-top:8px;">Huidige versie bewaren</button>
-        </div>
+        `)}
       </div>
     </div>
   `;
+
+  document.querySelectorAll(".panel-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const panel = btn.closest(".collapsible-panel");
+      panel.classList.toggle("is-open");
+    });
+  });
 
   document.getElementById("page-title-input").addEventListener("input", (e) => { pageData.title = e.target.value; markDirty(); });
   document.getElementById("page-slug-input").addEventListener("change", onSlugChange);
@@ -107,6 +114,19 @@ function renderShell(main) {
 
 function escapeAttr(str) {
   return (str || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+}
+
+/** Bouwt een uitklapbaar paneel (bijv. SEO, Versiegeschiedenis) met een pijltje. */
+function collapsiblePanel(id, title, openByDefault, innerHtml) {
+  return `
+    <div class="admin-card collapsible-panel${openByDefault ? " is-open" : ""}" id="${id}">
+      <button type="button" class="panel-toggle">
+        <h3>${title}</h3>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="panel-body">${innerHtml}</div>
+    </div>
+  `;
 }
 
 async function onSlugChange(e) {

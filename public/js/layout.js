@@ -17,7 +17,8 @@ function buildMenuItem(item) {
     a.target = "_blank";
     a.rel = "noopener";
   }
-  if (item.slug && location.pathname.replace(/^\//, "") === item.slug) {
+  const currentSlug = location.pathname.replace(/^\/|\/$/g, "") || "home";
+  if (item.slug && currentSlug === item.slug) {
     a.setAttribute("aria-current", "page");
   }
   li.appendChild(a);
@@ -42,28 +43,57 @@ async function renderHeader(settings) {
           ? `<img src="${settings.logoUrl}" alt="${settings.siteName || "Christine ten Kate"}" class="site-logo__img">`
           : (settings.logoText || "Christine <span>ten Kate</span>")}
       </a>
+      <nav class="main-nav" id="main-nav" aria-label="Hoofdmenu">
+        <ul class="main-nav__list" id="main-nav-dock"></ul>
+      </nav>
       <div class="site-search" data-search-root></div>
-      <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav" aria-label="Menu">
+      <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav-more" aria-label="Meer">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <nav class="main-nav" id="main-nav" aria-label="Hoofdmenu">
-        <ul class="main-nav__list" id="main-nav-list"></ul>
-      </nav>
     </div>
+    <div class="main-nav__more" id="main-nav-more"></div>
   `;
 
   const toggle = header.querySelector(".nav-toggle");
-  const nav = header.querySelector(".main-nav");
+  const more = header.querySelector("#main-nav-more");
   toggle.addEventListener("click", () => {
-    const isOpen = nav.classList.toggle("is-open");
+    const isOpen = more.classList.toggle("is-open");
     toggle.setAttribute("aria-expanded", String(isOpen));
+    toggle.classList.toggle("is-open", isOpen);
+  });
+  document.addEventListener("click", (e) => {
+    if (!header.contains(e.target)) { more.classList.remove("is-open"); toggle.setAttribute("aria-expanded", "false"); toggle.classList.remove("is-open"); }
   });
 
   try {
     const menuSnap = await getDoc(doc(db, "menu", "main"));
     const items = menuSnap.exists() ? (menuSnap.data().items || []) : [];
-    const list = document.getElementById("main-nav-list");
-    items.filter((item) => !item.hidden).forEach((item) => list.appendChild(buildMenuItem(item)));
+    const visible = items.filter((item) => !item.hidden);
+
+    // Het "dock": logo + altijd Home en Contact (als die bestaan), de rest
+    // schuilt achter het uitklapmenu, zodat de balk rustig en compact blijft.
+    const dockSlugs = ["home", "contact"];
+    const dockList = document.getElementById("main-nav-dock");
+    const dockItems = visible.filter((item) => item.type === "page" && dockSlugs.includes(item.slug));
+    const restItems = visible.filter((item) => !dockItems.includes(item));
+
+    // "Home" staat meestal niet apart in het menu (het logo linkt daar al
+    // naartoe) — voeg 'm toe als losse dock-knop als hij niet expliciet in
+    // het menu staat.
+    if (!dockItems.some((i) => i.slug === "home")) {
+      dockList.appendChild(buildMenuItem({ label: "Home", type: "page", slug: "home" }));
+    }
+    dockItems.forEach((item) => dockList.appendChild(buildMenuItem(item)));
+
+    const moreEl = document.getElementById("main-nav-more");
+    if (restItems.length) {
+      const ul = document.createElement("ul");
+      ul.className = "main-nav__list main-nav__list--more";
+      restItems.forEach((item) => ul.appendChild(buildMenuItem(item)));
+      moreEl.appendChild(ul);
+    } else {
+      header.querySelector(".nav-toggle").style.display = "none";
+    }
   } catch (err) {
     console.error("Menu kon niet geladen worden:", err);
   }

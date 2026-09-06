@@ -36,6 +36,7 @@
   max-width: var(--max-width);
   margin: 0 auto;
   gap: var(--space-3);
+  position: relative;
 }
 
 .site-logo {
@@ -53,14 +54,14 @@
 .site-logo span { color: var(--color-accent); }
 .site-logo__img { height: 42px; width: auto; display: block; }
 
-/* ============ Navigatie ============ */
+/* ============ Navigatie (dock-stijl: logo + Home/Contact vast, rest uitklapbaar) ============ */
 .main-nav { display: flex; }
 .main-nav__list {
   display: flex;
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: var(--space-4);
+  gap: var(--space-3);
   flex-wrap: wrap;
   align-items: center;
 }
@@ -113,32 +114,46 @@
 .main-nav__submenu a:hover { background: var(--color-bg-soft); }
 
 .nav-toggle {
-  display: none;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: transparent;
+  background: var(--color-bg-soft);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
   padding: 0;
   color: var(--color-primary);
-  transition: background var(--transition), border-color var(--transition);
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
 }
-.nav-toggle:hover { background: var(--color-bg-soft); border-color: var(--color-primary); }
+.nav-toggle:hover { background: var(--color-accent-soft); border-color: var(--color-accent); }
+.nav-toggle.is-open { transform: rotate(90deg); }
 .nav-toggle svg { width: 20px; height: 20px; pointer-events: none; }
 
+/* Het uitklapmenu met de "overige" pagina's, hangt onder de dock-balk. */
+.main-nav__more {
+  display: none;
+  position: absolute;
+  right: var(--space-4);
+  top: 100%;
+  margin-top: 6px;
+  background: var(--color-white);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-2);
+  min-width: 220px;
+  z-index: 90;
+}
+.main-nav__more.is-open { display: block; animation: nav-drop 200ms ease; }
+.main-nav__list--more { flex-direction: column; align-items: stretch; gap: 2px; }
+.main-nav__list--more a { padding: 8px 10px; border-radius: var(--radius-sm); display: block; }
+.main-nav__list--more a:hover { background: var(--color-bg-soft); }
+.main-nav__list--more a::after { display: none; }
+
 @media (max-width: 860px) {
-  .nav-toggle { display: inline-flex; }
-  .main-nav {
-    display: none;
-    width: 100%;
-    order: 3;
-  }
-  .main-nav.is-open { display: block; animation: nav-drop 220ms ease; }
-  .main-nav__list { flex-direction: column; align-items: flex-start; gap: var(--space-1); padding: var(--space-3) 0; }
-  .main-nav__submenu { position: static; box-shadow: none; border: none; opacity: 1; transform: none; display: block; padding-left: var(--space-3); }
-  .site-header__inner { flex-wrap: wrap; }
+  .site-header__inner { flex-wrap: wrap; position: relative; }
+  .main-nav__more { position: static; box-shadow: none; border: none; margin-top: var(--space-2); width: 100%; }
 }
 @keyframes nav-drop {
   from { opacity: 0; transform: translateY(-6px); }
