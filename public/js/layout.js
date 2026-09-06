@@ -115,7 +115,27 @@ export async function initLayout() {
   } catch (err) {
     console.error("Site-instellingen konden niet geladen worden:", err);
   }
+  applyColors(settings.colors);
   await renderHeader(settings);
   renderFooter(settings);
   return settings;
+}
+
+/** Overschrijft de standaardkleuren uit tokens.css met de kleuren die oma in Instellingen heeft gekozen. */
+function applyColors(colors) {
+  if (!colors) return;
+  const root = document.documentElement.style;
+  if (colors.primary) { root.setProperty("--color-primary", colors.primary); root.setProperty("--color-primary-dark", shade(colors.primary, -18)); }
+  if (colors.accent) { root.setProperty("--color-accent", colors.accent); root.setProperty("--color-accent-soft", shade(colors.accent, 55)); }
+  if (colors.bg) root.setProperty("--color-bg", colors.bg);
+}
+
+/** Maakt een hexkleur lichter (positief percentage) of donkerder (negatief), voor afgeleide tinten. */
+function shade(hex, percent) {
+  const num = parseInt(hex.replace("#", ""), 16);
+  const clamp = (v) => Math.max(0, Math.min(255, v));
+  const r = clamp(((num >> 16) & 0xff) + Math.round(2.55 * percent));
+  const g = clamp(((num >> 8) & 0xff) + Math.round(2.55 * percent));
+  const b = clamp((num & 0xff) + Math.round(2.55 * percent));
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
 }

@@ -10,6 +10,8 @@ let logoUrl = "";
 let trustBadgeUrl = "";
 let trustBadgeAlt = "";
 
+const DEFAULT_COLORS = { primary: "#2F4A3E", accent: "#E2963F", bg: "#FBF9F4" };
+
 async function boot() {
   const admin = await requireAdmin();
   renderAdminShell("settings", admin);
@@ -32,6 +34,17 @@ async function boot() {
 
   renderLogoPreview();
   renderBadgePreview();
+
+  const colors = { ...DEFAULT_COLORS, ...(data.colors || {}) };
+  document.getElementById("c-primary").value = colors.primary;
+  document.getElementById("c-accent").value = colors.accent;
+  document.getElementById("c-bg").value = colors.bg;
+  document.getElementById("reset-colors-btn").addEventListener("click", () => {
+    document.getElementById("c-primary").value = DEFAULT_COLORS.primary;
+    document.getElementById("c-accent").value = DEFAULT_COLORS.accent;
+    document.getElementById("c-bg").value = DEFAULT_COLORS.bg;
+  });
+
   document.getElementById("pick-logo-btn").addEventListener("click", async () => {
     const media = await openMediaPicker({ accept: "image" });
     if (media) { logoUrl = media.url; renderLogoPreview(); }
@@ -93,6 +106,11 @@ async function save() {
       trustBadgeUrl,
       trustBadgeAlt,
       socialLinks,
+      colors: {
+        primary: document.getElementById("c-primary").value,
+        accent: document.getElementById("c-accent").value,
+        bg: document.getElementById("c-bg").value,
+      },
     });
     showToast("Instellingen opgeslagen.");
   } catch (err) {

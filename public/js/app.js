@@ -100,7 +100,10 @@ async function loadPage() {
   }
 }
 
-initLayout();
+// initLayout() eerst (en gewacht) zodat de eigen kleuren van oma al
+// toegepast zijn vóórdat de pagina-inhoud verschijnt — anders flitst de
+// pagina heel even in de standaardkleuren.
+await initLayout();
 initCookieBanner();
 loadPage();
 
