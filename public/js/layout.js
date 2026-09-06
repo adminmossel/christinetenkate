@@ -43,7 +43,9 @@ async function renderHeader(settings) {
           : (settings.logoText || "Christine <span>ten Kate</span>")}
       </a>
       <div class="site-search" data-search-root></div>
-      <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
       <nav class="main-nav" id="main-nav" aria-label="Hoofdmenu">
         <ul class="main-nav__list" id="main-nav-list"></ul>
       </nav>

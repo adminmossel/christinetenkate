@@ -1,0 +1,63 @@
+/*
+  site-preview.css
+  De editor draait zelf in de blauw/witte "builder"-stijl (zie
+  admin-theme.css), maar de live voorbeeldjes van elk blok moeten er
+  precies zo uitzien als op de echte website. Deze klasse herstelt daarom,
+  ALLEEN binnen dat voorbeeldvakje, de originele kleuren/lettertypes van
+  tokens.css — die zouden anders overschreven worden door admin-theme.css.
+*/
+
+.site-preview {
+  --color-bg:            #FBF9F4;
+  --color-bg-soft:       #F1ECDF;
+  --color-ink:           #1F2E27;
+  --color-ink-soft:      #4B5D54;
+  --color-primary:       #2F4A3E;
+  --color-primary-dark:  #1D2F27;
+  --color-accent:        #E2963F;
+  --color-accent-soft:   #F4D9AE;
+  --color-teal:          #4A7A72;
+  --color-line:          #DCD5C3;
+  --color-white:         #FFFFFF;
+  --radius-sm: 6px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --shadow-soft: 0 1px 3px rgba(31, 46, 39, 0.08);
+  --shadow-md: 0 8px 24px rgba(31, 46, 39, 0.10);
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Work Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-line);
+}
+.site-preview h1, .site-preview h2, .site-preview h3,
+.site-preview h4, .site-preview h5, .site-preview h6 {
+  font-family: var(--font-display);
+  color: var(--color-primary);
+}
+.site-preview a { color: var(--color-accent); }
+.site-preview .content-blocks { padding: 0; }
+.site-preview .content-blocks > *:not(.hero) { max-width: none; padding-left: 0; padding-right: 0; }
+.site-preview .hero { padding: var(--space-4) 0; }
+.site-preview .hero::before { display: none; }
+
+.site-preview-label {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-soft);
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* Als het tekstblok zelf al de rijke-teksteditor is (editText), moet het
+   vast blijven zitten aan de werkbalk erboven in plaats van een eigen volle
+   rand/afronding te krijgen. */
+.rich-text-editable.site-preview {
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  padding: var(--space-3);
+}

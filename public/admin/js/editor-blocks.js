@@ -8,6 +8,7 @@
 import { buildRichToolbar } from "./rich-toolbar.js";
 import { openMediaPicker, fetchMediaMap } from "./media-picker.js";
 import { openLinkPicker } from "./link-picker.js";
+import { renderBlocks, collectMediaIds } from "../../js/render.js";
 
 let blockIdCounter = 0;
 function newId() { return `b${Date.now()}${blockIdCounter++}`; }
@@ -109,12 +110,43 @@ function imagePreviewAndPicker(mediaId, onPick) {
   return wrap;
 }
 
+/**
+ * Bouwt een live "zo ziet dit blok er straks uit"-voorbeeld, in de echte
+ * kleuren/lettertypes van de website. `getSnapshot()` moet de actuele
+ * blokdata teruggeven; roep `preview.refresh()` aan na elke wijziging.
+ */
+function livePreview(getSnapshot) {
+  const wrap = document.createElement("div");
+  wrap.className = "site-preview";
+  const label = document.createElement("span");
+  label.className = "site-preview-label";
+  label.textContent = "Zo ziet dit eruit op de website";
+  const target = document.createElement("div");
+  wrap.appendChild(label);
+  wrap.appendChild(target);
+
+  let debounceTimer;
+  async function renderNow() {
+    const snapshot = getSnapshot();
+    const mediaMap = await fetchMediaMap(collectMediaIds([snapshot]));
+    renderBlocks([snapshot], target, mediaMap);
+  }
+  renderNow();
+
+  return {
+    el: wrap,
+    refresh() { clearTimeout(debounceTimer); debounceTimer = setTimeout(renderNow, 300); },
+  };
+}
+
 // ---------- Individuele editors ----------
 
 function editText(block, patch) {
   const wrap = document.createElement("div");
   const editable = document.createElement("div");
-  editable.className = "rich-text-editable";
+  // "site-preview" hier direct op het tekstvak: bewerken IS het voorbeeld,
+  // geen los, dubbel voorbeeldvakje nodig voor dit bloktype.
+  editable.className = "rich-text-editable site-preview";
   editable.contentEditable = "true";
   editable.innerHTML = block.html || "";
   const toolbar = buildRichToolbar(editable, (html) => patch({ html }));
@@ -125,42 +157,67 @@ function editText(block, patch) {
 
 function editHeading(block, patch) {
   const wrap = document.createElement("div");
-  wrap.appendChild(field("Titeltekst", textInput(block.text, (v) => patch({ text: v }))));
-  wrap.appendChild(field("Kopniveau", selectInput(String(block.level || 2), [1,2,3,4,5,6].map((n) => ({ value: String(n), label: `H${n}` })), (v) => patch({ level: Number(v) }))));
+  const level = Math.min(6, Math.max(1, block.level || 2));
+
+  const headingWrap = document.createElement("div");
+  headingWrap.className = "site-preview";
+  const heading = document.createElement(`h${level}`);
+  heading.contentEditable = "true";
+  heading.style.margin = "0";
+  heading.style.outline = "none";
+  heading.style.textAlign = block.align || "left";
+  heading.textContent = block.text || "";
+  heading.addEventListener("input", () => patch({ text: heading.textContent }));
+  heading.addEventListener("paste", (e) => {
+    e.preventDefault();
+    document.execCommand("insertText", false, (e.clipboardData || window.clipboardData).getData("text/plain"));
+  });
+  headingWrap.appendChild(heading);
+  wrap.appendChild(headingWrap);
+
+  wrap.appendChild(field("Kopniveau", selectInput(String(level), [1,2,3,4,5,6].map((n) => ({ value: String(n), label: `H${n}` })), (v) => patch({ level: Number(v) }))));
   wrap.appendChild(field("Uitlijning", selectInput(block.align || "left", [
     { value: "left", label: "Links" }, { value: "center", label: "Centreren" }, { value: "right", label: "Rechts" },
-  ], (v) => patch({ align: v }))));
+  ], (v) => { heading.style.textAlign = v; patch({ align: v }); })));
   return wrap;
 }
 
 function editQuote(block, patch) {
   const wrap = document.createElement("div");
+  const preview = livePreview(() => ({ ...block }));
+  wrap.appendChild(preview.el);
+
   const ta = document.createElement("textarea");
   ta.rows = 3; ta.value = block.text || "";
-  ta.addEventListener("input", () => patch({ text: ta.value }));
+  ta.addEventListener("input", () => { patch({ text: ta.value }); preview.refresh(); });
   wrap.appendChild(field("Citaat", ta));
-  wrap.appendChild(field("Bron (optioneel)", textInput(block.cite, (v) => patch({ cite: v }), "bijv. naam van de spreker")));
+  const citeInput = textInput(block.cite, (v) => { patch({ cite: v }); preview.refresh(); }, "bijv. naam van de spreker");
+  wrap.appendChild(field("Bron (optioneel)", citeInput));
   return wrap;
 }
 
 
 function editImage(block, patch) {
   const wrap = document.createElement("div");
+  const preview = livePreview(() => ({ ...block }));
+  wrap.appendChild(preview.el);
+
   wrap.appendChild(imagePreviewAndPicker(block.mediaId, (media) => {
     patch({ mediaId: media.id, alt: block.alt || media.alt || "" });
+    preview.refresh();
   }));
-  wrap.appendChild(field("Alt-tekst (voor screenreaders en SEO)", textInput(block.alt, (v) => patch({ alt: v }))));
-  wrap.appendChild(field("Bijschrift (optioneel)", textInput(block.caption, (v) => patch({ caption: v }))));
+  wrap.appendChild(field("Alt-tekst (voor screenreaders en SEO)", textInput(block.alt, (v) => { patch({ alt: v }); preview.refresh(); })));
+  wrap.appendChild(field("Bijschrift (optioneel)", textInput(block.caption, (v) => { patch({ caption: v }); preview.refresh(); })));
   wrap.appendChild(field("Uitlijning", selectInput(block.align || "center", [
     { value: "left", label: "Links (tekst loopt eromheen)" },
     { value: "center", label: "Centreren" },
     { value: "right", label: "Rechts (tekst loopt eromheen)" },
-  ], (v) => patch({ align: v }))));
+  ], (v) => { patch({ align: v }); preview.refresh(); })));
   const widthInput = document.createElement("input");
   widthInput.type = "range"; widthInput.min = "20"; widthInput.max = "100"; widthInput.value = block.widthPercent || 100;
-  widthInput.addEventListener("input", () => patch({ widthPercent: Number(widthInput.value) }));
+  widthInput.addEventListener("input", () => { patch({ widthPercent: Number(widthInput.value) }); preview.refresh(); });
   wrap.appendChild(field("Breedte (%)", widthInput));
-  wrap.appendChild(linkButton(block.link, (link) => patch({ link })));
+  wrap.appendChild(linkButton(block.link, (link) => { patch({ link }); preview.refresh(); }));
   return wrap;
 }
 
@@ -231,6 +288,9 @@ function editGallery(block, patch) {
 
 function editFile(block, patch) {
   const wrap = document.createElement("div");
+  const preview = livePreview(() => ({ ...block }));
+  wrap.appendChild(preview.el);
+
   const trigger = document.createElement("button");
   trigger.type = "button";
   trigger.className = "btn-admin";
@@ -245,10 +305,11 @@ function editFile(block, patch) {
     if (media) {
       patch({ mediaId: media.id });
       trigger.textContent = `Bestand: ${media.name}`;
+      preview.refresh();
     }
   });
   wrap.appendChild(field("Bestand", trigger));
-  wrap.appendChild(field("Knoptekst", textInput(block.label, (v) => patch({ label: v }), "Bekijk het document")));
+  wrap.appendChild(field("Knoptekst", textInput(block.label, (v) => { patch({ label: v }); preview.refresh(); }, "Bekijk het document")));
   return wrap;
 }
 
@@ -265,14 +326,17 @@ function editEmbed(block, patch) {
 
 function editButton(block, patch) {
   const wrap = document.createElement("div");
-  wrap.appendChild(field("Knoptekst", textInput(block.text, (v) => patch({ text: v }))));
+  const preview = livePreview(() => ({ ...block }));
+  wrap.appendChild(preview.el);
+
+  wrap.appendChild(field("Knoptekst", textInput(block.text, (v) => { patch({ text: v }); preview.refresh(); })));
   wrap.appendChild(field("Stijl", selectInput(block.style || "solid", [
     { value: "solid", label: "Gevuld" }, { value: "outline", label: "Omlijnd" },
-  ], (v) => patch({ style: v }))));
+  ], (v) => { patch({ style: v }); preview.refresh(); })));
   wrap.appendChild(field("Uitlijning", selectInput(block.align || "left", [
     { value: "left", label: "Links" }, { value: "center", label: "Centreren" }, { value: "right", label: "Rechts" },
-  ], (v) => patch({ align: v }))));
-  wrap.appendChild(linkButton(block.link, (link) => patch({ link })));
+  ], (v) => { patch({ align: v }); preview.refresh(); })));
+  wrap.appendChild(linkButton(block.link, (link) => { patch({ link }); preview.refresh(); }));
   return wrap;
 }
 
@@ -381,21 +445,27 @@ function editSpacer(block, patch) {
 
 function editHero(block, patch) {
   const wrap = document.createElement("div");
-  wrap.appendChild(field("Kleine tekst boven de titel (optioneel)", textInput(block.eyebrow, (v) => patch({ eyebrow: v }))));
-  wrap.appendChild(field("Titel", textInput(block.title, (v) => patch({ title: v }))));
+  const preview = livePreview(() => ({ ...block }));
+  wrap.appendChild(preview.el);
+
+  wrap.appendChild(field("Kleine tekst boven de titel (optioneel)", textInput(block.eyebrow, (v) => { patch({ eyebrow: v }); preview.refresh(); })));
+  wrap.appendChild(field("Titel", textInput(block.title, (v) => { patch({ title: v }); preview.refresh(); })));
   const lead = document.createElement("textarea");
   lead.rows = 3; lead.value = block.lead || "";
-  lead.addEventListener("input", () => patch({ lead: lead.value }));
+  lead.addEventListener("input", () => { patch({ lead: lead.value }); preview.refresh(); });
   wrap.appendChild(field("Introductietekst", lead));
-  wrap.appendChild(imagePreviewAndPicker(block.imageMediaId, (media) => { patch({ imageMediaId: media.id, imageAlt: block.imageAlt || media.alt || "" }); }));
-  wrap.appendChild(field("Alt-tekst afbeelding", textInput(block.imageAlt, (v) => patch({ imageAlt: v }))));
-  wrap.appendChild(field("Knoptekst (optioneel)", textInput(block.buttonText, (v) => patch({ buttonText: v }))));
-  wrap.appendChild(linkButton(block.buttonLink, (link) => patch({ buttonLink: link })));
+  wrap.appendChild(imagePreviewAndPicker(block.imageMediaId, (media) => { patch({ imageMediaId: media.id, imageAlt: block.imageAlt || media.alt || "" }); preview.refresh(); }));
+  wrap.appendChild(field("Alt-tekst afbeelding", textInput(block.imageAlt, (v) => { patch({ imageAlt: v }); preview.refresh(); })));
+  wrap.appendChild(field("Knoptekst (optioneel)", textInput(block.buttonText, (v) => { patch({ buttonText: v }); preview.refresh(); })));
+  wrap.appendChild(linkButton(block.buttonLink, (link) => { patch({ buttonLink: link }); preview.refresh(); }));
   return wrap;
 }
 
 function editTiles(block, patch) {
   const wrap = document.createElement("div");
+  const preview = livePreview(() => ({ ...block, items: (block.items || []).map((i) => ({ ...i })) }));
+  wrap.appendChild(preview.el);
+
   const list = document.createElement("div");
 
   function renderList() {
@@ -404,16 +474,16 @@ function editTiles(block, patch) {
       const row = document.createElement("div");
       row.className = "column-editor";
       row.style.marginBottom = "8px";
-      row.appendChild(field("Titel", textInput(item.title, (v) => { item.title = v; patch({ items: block.items }); })));
+      row.appendChild(field("Titel", textInput(item.title, (v) => { item.title = v; patch({ items: block.items }); preview.refresh(); })));
       const text = document.createElement("textarea");
       text.rows = 2; text.value = item.text || "";
-      text.addEventListener("input", () => { item.text = text.value; patch({ items: block.items }); });
+      text.addEventListener("input", () => { item.text = text.value; patch({ items: block.items }); preview.refresh(); });
       row.appendChild(field("Tekst", text));
-      row.appendChild(linkButton(item.link, (link) => { item.link = link; patch({ items: block.items }); }));
+      row.appendChild(linkButton(item.link, (link) => { item.link = link; patch({ items: block.items }); preview.refresh(); }));
       const removeBtn = document.createElement("button");
       removeBtn.type = "button"; removeBtn.className = "btn-admin btn-admin--danger";
       removeBtn.textContent = "Tegel verwijderen"; removeBtn.style.marginTop = "6px";
-      removeBtn.addEventListener("click", () => { block.items.splice(idx, 1); patch({ items: block.items }); renderList(); });
+      removeBtn.addEventListener("click", () => { block.items.splice(idx, 1); patch({ items: block.items }); renderList(); preview.refresh(); });
       row.appendChild(removeBtn);
       list.appendChild(row);
     });
@@ -427,6 +497,7 @@ function editTiles(block, patch) {
     block.items.push({ title: "Titel", text: "Omschrijving", link: null });
     patch({ items: block.items });
     renderList();
+    preview.refresh();
   });
 
   wrap.appendChild(list);

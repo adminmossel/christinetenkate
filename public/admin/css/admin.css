@@ -138,6 +138,9 @@ table.admin-table { width: 100%; border-collapse: collapse; }
 .block-item__actions button { background: none; border: none; font-size: var(--fs-sm); padding: 2px 6px; cursor: pointer; color: var(--color-ink-soft); }
 .block-item__actions button:hover { color: var(--color-primary); }
 .block-item__body { padding: var(--space-3); }
+.block-item__body > .site-preview { margin-bottom: var(--space-3); }
+.block-item__body > .site-preview + .admin-field,
+.block-item__body > .rich-text-editable ~ * { margin-top: var(--space-2); }
 .block-item__dropzone { height: 8px; }
 .block-item__dropzone.is-over { background: var(--color-accent-soft); }
 

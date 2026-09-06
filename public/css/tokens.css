@@ -42,11 +42,14 @@
   --space-6: 5.2rem;
 
   /* --- Overig --- */
-  --radius-sm: 4px;
-  --radius-md: 10px;
+  --radius-sm: 6px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
   --max-width: 1180px;
   --shadow-soft: 0 1px 3px rgba(31, 46, 39, 0.08);
-  --transition: 180ms ease;
+  --shadow-md: 0 8px 24px rgba(31, 46, 39, 0.10);
+  --shadow-lg: 0 20px 48px rgba(31, 46, 39, 0.14);
+  --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * { box-sizing: border-box; }
