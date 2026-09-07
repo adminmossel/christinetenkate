@@ -37,18 +37,16 @@ async function renderHeader(settings) {
   if (!header) return;
 
   header.innerHTML = `
-    <div class="site-header__inner">
+    <div class="site-header__island">
       <a class="site-logo" href="/">
         ${settings.logoUrl
           ? `<img src="${settings.logoUrl}" alt="${settings.siteName || "Christine ten Kate"}" class="site-logo__img">`
           : (settings.logoText || "Christine <span>ten Kate</span>")}
       </a>
-      <nav class="main-nav" id="main-nav" aria-label="Hoofdmenu">
-        <ul class="main-nav__list" id="main-nav-dock"></ul>
-      </nav>
       <div class="site-search" data-search-root></div>
-      <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav-more" aria-label="Meer">
+      <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav-more" aria-label="Menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <span>Menu</span>
       </button>
     </div>
     <div class="main-nav__more" id="main-nav-more"></div>
@@ -70,30 +68,14 @@ async function renderHeader(settings) {
     const items = menuSnap.exists() ? (menuSnap.data().items || []) : [];
     const visible = items.filter((item) => !item.hidden);
 
-    // Het "dock": logo + altijd Home en Contact (als die bestaan), de rest
-    // schuilt achter het uitklapmenu, zodat de balk rustig en compact blijft.
-    const dockSlugs = ["home", "contact"];
-    const dockList = document.getElementById("main-nav-dock");
-    const dockItems = visible.filter((item) => item.type === "page" && dockSlugs.includes(item.slug));
-    const restItems = visible.filter((item) => !dockItems.includes(item));
-
-    // "Home" staat meestal niet apart in het menu (het logo linkt daar al
-    // naartoe) — voeg 'm toe als losse dock-knop als hij niet expliciet in
-    // het menu staat.
-    if (!dockItems.some((i) => i.slug === "home")) {
-      dockList.appendChild(buildMenuItem({ label: "Home", type: "page", slug: "home" }));
-    }
-    dockItems.forEach((item) => dockList.appendChild(buildMenuItem(item)));
-
     const moreEl = document.getElementById("main-nav-more");
-    if (restItems.length) {
-      const ul = document.createElement("ul");
-      ul.className = "main-nav__list main-nav__list--more";
-      restItems.forEach((item) => ul.appendChild(buildMenuItem(item)));
-      moreEl.appendChild(ul);
-    } else {
-      header.querySelector(".nav-toggle").style.display = "none";
+    const ul = document.createElement("ul");
+    ul.className = "main-nav__list main-nav__list--more";
+    if (!visible.some((i) => i.type === "page" && i.slug === "home")) {
+      ul.appendChild(buildMenuItem({ label: "Home", type: "page", slug: "home" }));
     }
+    visible.forEach((item) => ul.appendChild(buildMenuItem(item)));
+    moreEl.appendChild(ul);
   } catch (err) {
     console.error("Menu kon niet geladen worden:", err);
   }

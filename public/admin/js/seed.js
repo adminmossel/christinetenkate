@@ -86,8 +86,8 @@ const PAGES = [
       heading("Mijn werkwijze", 2),
       paragraph("Leg hier uit hoe een traject er bij jou uitziet: begin je altijd met een intakegesprek? Werk je met vaste modules of maatwerk? Sta je ook na afloop van een training nog beschikbaar voor vragen?"),
       { id: bid(), type: "columns", columns: 2, items: [
-        [paragraph("<strong>Praktisch</strong>")],
-        [paragraph("<strong>Persoonlijk</strong>")],
+        { blocks: [paragraph("<strong>Praktisch</strong>")] },
+        { blocks: [paragraph("<strong>Persoonlijk</strong>")] },
       ] },
       divider(),
       heading("In het kort", 3),
@@ -187,8 +187,8 @@ const PAGES = [
       heading("Contact", 1),
       paragraph("Neem gerust contact op via onderstaand formulier, telefoon of e-mail — ik reageer meestal binnen enkele werkdagen."),
       { id: bid(), type: "columns", columns: 2, items: [
-        [paragraph("<strong>Christine ten Kate</strong><br>Zuiderlaan 199<br>7944 EE Meppel<br>T 0522 - 24 43 66<br>M 06 - 30 86 09 63<br>E info@christinetenkate.nl<br>KvK-nr. 60855851")],
-        [{ id: bid(), type: "contact-form", buttonText: "Versturen" }],
+        { blocks: [paragraph("<strong>Christine ten Kate</strong><br>Zuiderlaan 199<br>7944 EE Meppel<br>T 0522 - 24 43 66<br>M 06 - 30 86 09 63<br>E info@christinetenkate.nl<br>KvK-nr. 60855851")] },
+        { blocks: [{ id: bid(), type: "contact-form", buttonText: "Versturen" }] },
       ] },
     ],
   },

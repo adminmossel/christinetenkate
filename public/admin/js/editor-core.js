@@ -52,6 +52,10 @@ function renderShell(main) {
         <div style="display:flex;gap:8px;align-items:center;">
           <span id="autosave-indicator" style="font-size:var(--fs-sm);color:var(--color-ink-soft);"></span>
           <span class="status-pill status-pill--${pageData.status}" id="status-pill">${pageData.status === "published" ? "Gepubliceerd" : "Concept"}</span>
+          <button class="btn-admin" id="open-settings-btn" title="SEO en versiegeschiedenis" aria-label="Pagina-instellingen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Instellingen
+          </button>
           <button class="btn-admin" id="save-draft-btn">Concept opslaan</button>
           <button class="btn-admin btn-admin--primary" id="publish-btn">Publiceren</button>
         </div>
@@ -65,7 +69,15 @@ function renderShell(main) {
 
     <div class="editor-shell">
       <div class="editor-canvas" id="editor-canvas"></div>
-      <div class="editor-sidebar">
+    </div>
+
+    <div class="settings-drawer" id="settings-drawer">
+      <div class="settings-drawer__backdrop" id="settings-drawer-backdrop"></div>
+      <div class="settings-drawer__panel">
+        <div class="settings-drawer__header">
+          <h2>Pagina-instellingen</h2>
+          <button type="button" class="btn-admin" id="close-settings-btn">Sluiten</button>
+        </div>
         ${collapsiblePanel("seo-panel", "SEO", true, `
           <div class="admin-field">
             <label>SEO-titel</label>
@@ -76,13 +88,18 @@ function renderShell(main) {
             <textarea id="seo-description" rows="3">${pageData.seo.description || ""}</textarea>
           </div>
         `)}
-        ${collapsiblePanel("versions-panel", "Versiegeschiedenis", false, `
+        ${collapsiblePanel("versions-panel", "Versiegeschiedenis", true, `
           <div id="version-list"><p style="font-size:var(--fs-sm);color:var(--color-ink-soft);">Wordt geladen…</p></div>
           <button class="btn-admin" id="save-version-btn" style="margin-top:8px;">Huidige versie bewaren</button>
         `)}
       </div>
     </div>
   `;
+
+  const drawer = document.getElementById("settings-drawer");
+  document.getElementById("open-settings-btn").addEventListener("click", () => drawer.classList.add("is-open"));
+  document.getElementById("close-settings-btn").addEventListener("click", () => drawer.classList.remove("is-open"));
+  document.getElementById("settings-drawer-backdrop").addEventListener("click", () => drawer.classList.remove("is-open"));
 
   document.querySelectorAll(".panel-toggle").forEach((btn) => {
     btn.addEventListener("click", () => {

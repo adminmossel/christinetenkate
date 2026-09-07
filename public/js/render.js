@@ -214,9 +214,9 @@ function renderSpacerBlock(block) {
 
 function renderColumnsBlock(block, mediaMap) {
   const wrap = el("div", "block-columns", { "data-columns": block.columns || 2 });
-  (block.items || []).forEach((columnBlocks) => {
+  (block.items || []).forEach((column) => {
     const col = el("div", "block-column");
-    renderBlocks(columnBlocks || [], col, mediaMap);
+    renderBlocks(column?.blocks || [], col, mediaMap);
     wrap.appendChild(col);
   });
   return wrap;
@@ -376,7 +376,7 @@ export function collectMediaIds(blocks, ids = new Set()) {
       block.items.forEach((item) => { if (item.link?.type === "file" && item.link.value) ids.add(item.link.value); });
     }
     if (block.type === "columns" && Array.isArray(block.items)) {
-      block.items.forEach((columnBlocks) => collectMediaIds(columnBlocks, ids));
+      block.items.forEach((column) => collectMediaIds(column?.blocks, ids));
     }
     if (block.type === "text" && block.html) {
       const matches = block.html.matchAll(/href="media:([^"]+)"/g);

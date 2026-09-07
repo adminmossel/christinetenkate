@@ -24,7 +24,7 @@ export const BLOCK_LIBRARY = {
   button: { label: "Knop", group: "Interactie", factory: () => ({ id: newId(), type: "button", text: "Klik hier", link: null, align: "left", style: "solid" }) },
   "contact-form": { label: "Contactformulier", group: "Interactie", factory: () => ({ id: newId(), type: "contact-form", buttonText: "Versturen" }) },
   faq: { label: "Vraag & antwoord (FAQ)", group: "Interactie", factory: () => ({ id: newId(), type: "faq", items: [{ question: "Een veelgestelde vraag?", answer: "Het antwoord hierop." }] }) },
-  columns: { label: "Kolommen", group: "Layout", factory: () => ({ id: newId(), type: "columns", columns: 2, items: [[], []] }) },
+  columns: { label: "Kolommen", group: "Layout", factory: () => ({ id: newId(), type: "columns", columns: 2, items: [{ blocks: [] }, { blocks: [] }] }) },
   divider: { label: "Scheidingslijn", group: "Layout", factory: () => ({ id: newId(), type: "divider" }) },
   spacer: { label: "Ruimte", group: "Layout", factory: () => ({ id: newId(), type: "spacer", height: 40 }) },
 };
@@ -397,7 +397,7 @@ function editColumns(block, patch, renderNestedBlocks) {
   ], (v) => {
     const n = Number(v);
     const items = block.items || [];
-    while (items.length < n) items.push([]);
+    while (items.length < n) items.push({ blocks: [] });
     patch({ columns: n, items: items.slice(0, n) });
     renderTabs();
   })));
@@ -422,8 +422,11 @@ function editColumns(block, patch, renderNestedBlocks) {
   function renderBody() {
     body.innerHTML = "";
     block.items = block.items || [];
-    if (!block.items[activeCol]) block.items[activeCol] = [];
-    renderNestedBlocks(body, block.items[activeCol], (updated) => { block.items[activeCol] = updated; patch({ items: block.items }); });
+    // Let op: Firestore ondersteunt geen "array binnen een array" — daarom
+    // is elke kolom een object { blocks: [...] } in plaats van rechtstreeks
+    // een array.
+    if (!block.items[activeCol]) block.items[activeCol] = { blocks: [] };
+    renderNestedBlocks(body, block.items[activeCol].blocks, (updated) => { block.items[activeCol].blocks = updated; patch({ items: block.items }); });
   }
   renderTabs();
   renderBody();
