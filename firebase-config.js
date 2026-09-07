@@ -7,13 +7,14 @@
 // Zie INSTALLATIE.md stap "Firebase-configuratie toevoegen" voor de volledige uitleg.
 
 export const firebaseConfig = {
-  apiKey: "VUL_HIER_JE_API_KEY_IN",
-  authDomain: "VUL_HIER_JE_PROJECT.firebaseapp.com",
-  projectId: "VUL_HIER_JE_PROJECT_ID",
-  storageBucket: "VUL_HIER_JE_PROJECT.appspot.com",
-  messagingSenderId: "VUL_HIER_JE_SENDER_ID",
-  appId: "VUL_HIER_JE_APP_ID",
+  apiKey: "AIzaSyATboS6Da0ukExPvv5l1gyCQoRJb4JUarw",
+  authDomain: "christinetenkate-website.firebaseapp.com",
+  projectId: "christinetenkate-website",
+  storageBucket: "christinetenkate-website.firebasestorage.app",
+  messagingSenderId: "1011471273655",
+  appId: "1:1011471273655:web:e0244c65edd010e2ac8732"
 };
+
 
 // Let op: deze waarden zijn NIET geheim (ze zijn zichtbaar in de browser van
 // elke bezoeker). De echte beveiliging zit in de Firestore Security Rules
