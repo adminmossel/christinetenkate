@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://christinetenkate.nl/sitemap.xml
+Sitemap: https://christinetenkate.tygomassalt.workers.dev/sitemap.xml
