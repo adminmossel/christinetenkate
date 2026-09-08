@@ -1,6 +1,6 @@
 // editor-core.js
 import { requireAdmin, getCurrentAdmin } from "./admin-auth.js";
-import { renderAdminShell, showToast } from "./admin-shell.js";
+import { renderAdminShell, showToast, forceRepaint } from "./admin-shell.js";
 import { slugify, ensureUniqueSlug } from "./slugify.js";
 import { BLOCK_LIBRARY, HOME_ONLY_BLOCKS, buildBlockEditorUI } from "./editor-blocks.js";
 import { db } from "../../js/firebase-init.js";
@@ -291,6 +291,7 @@ function renderCanvas() {
   }
 
   renderBlockList(canvas, pageData.blocks, (updated) => { pageData.blocks = updated; markDirty(); }, true);
+  forceRepaint(canvas);
 }
 
 /**

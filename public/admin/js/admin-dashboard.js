@@ -1,6 +1,6 @@
 // admin-dashboard.js
 import { requireAdmin, getCurrentAdmin } from "./admin-auth.js";
-import { renderAdminShell, showToast } from "./admin-shell.js";
+import { renderAdminShell, showToast, forceRepaint } from "./admin-shell.js";
 import { slugify, ensureUniqueSlug } from "./slugify.js";
 import { db } from "../../js/firebase-init.js";
 import {
@@ -79,6 +79,7 @@ async function loadPages() {
       actionsCell.appendChild(actionsFor(docSnap.id, page));
       tbody.appendChild(row);
     });
+    forceRepaint(tbody);
   } catch (err) {
     console.error(err);
     tbody.innerHTML = `<tr><td colspan="5">Er ging iets mis bij het laden van de pagina's.</td></tr>`;

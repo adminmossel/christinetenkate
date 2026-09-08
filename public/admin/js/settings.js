@@ -39,10 +39,13 @@ async function boot() {
   document.getElementById("c-primary").value = colors.primary;
   document.getElementById("c-accent").value = colors.accent;
   document.getElementById("c-bg").value = colors.bg;
-  document.getElementById("reset-colors-btn").addEventListener("click", () => {
+  document.getElementById("reset-colors-btn").addEventListener("click", async () => {
     document.getElementById("c-primary").value = DEFAULT_COLORS.primary;
     document.getElementById("c-accent").value = DEFAULT_COLORS.accent;
     document.getElementById("c-bg").value = DEFAULT_COLORS.bg;
+    // Slaat meteen op — anders leek het net of het gereset was, terwijl de
+    // oude kleur pas echt verdween na een aparte klik op "Opslaan".
+    await save();
   });
 
   document.getElementById("pick-logo-btn").addEventListener("click", async () => {
@@ -91,7 +94,24 @@ function renderSocialLinks() {
   });
 }
 
+/** Grove inschatting van helderheid (0 = zwart, 255 = wit) om te waarschuwen voor bijna-witte kleuren. */
+function luminance(hex) {
+  const num = parseInt(hex.replace("#", ""), 16);
+  const r = (num >> 16) & 0xff, g = (num >> 8) & 0xff, b = num & 0xff;
+  return (r * 299 + g * 587 + b * 114) / 1000;
+}
+
 async function save() {
+  const accent = document.getElementById("c-accent").value;
+  const primary = document.getElementById("c-primary").value;
+  const bg = document.getElementById("c-bg").value;
+  const tooLight = [["Hoofdkleur", primary], ["Accentkleur", accent]].filter(([, hex]) => luminance(hex) > 235);
+  if (tooLight.length && bg && luminance(bg) > 200) {
+    const names = tooLight.map(([name]) => name).join(" en ");
+    if (!confirm(`Let op: ${names} ${tooLight.length > 1 ? "zijn" : "is"} bijna wit — knoppen/tekst in die kleur worden dan onzichtbaar op de (ook lichte) achtergrond. Toch opslaan?`)) {
+      return;
+    }
+  }
   try {
     await setDoc(doc(db, "settings", "site"), {
       siteName: document.getElementById("s-siteName").value.trim(),

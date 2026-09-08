@@ -70,6 +70,12 @@ export function renderAdminShell(activeKey, adminProfile, options = {}) {
     if (confirm("Weet je zeker dat je wilt uitloggen?")) logout();
   });
 
+  forceRepaint(shell);
+  // Nog een keer, iets later — vangt gevallen op waarbij de pagina zelf
+  // daarna nóg meer content toevoegt (bijv. de pagina-tabel die pas na een
+  // Firestore-call gevuld wordt).
+  setTimeout(() => forceRepaint(shell), 400);
+
   return main;
 }
 
@@ -80,4 +86,18 @@ export function showToast(message, isError = false) {
   toast.textContent = message;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3500);
+}
+
+/**
+ * Dwingt de browser een net ingevoegd stuk pagina opnieuw te "tekenen".
+ * Bepaalde Chromium-gebaseerde browsers (waaronder Brave) laten grote,
+ * in één keer ingevoegde stukken HTML soms onzichtbaar totdat de
+ * gebruiker ergens op klikt/hovert — dit forceert dat meteen, zonder dat
+ * daar een interactie voor nodig is.
+ */
+export function forceRepaint(el = document.body) {
+  requestAnimationFrame(() => {
+    el.style.opacity = "0.999";
+    requestAnimationFrame(() => { el.style.opacity = ""; });
+  });
 }

@@ -109,3 +109,12 @@ initCookieBanner();
 trackVisit();
 loadPage();
 
+// Voorkomt dat het tijdelijke *.workers.dev-adres ooit door Google
+// geïndexeerd wordt — dat moet straks alleen het échte domein zijn.
+if (location.hostname.endsWith("workers.dev")) {
+  const meta = document.createElement("meta");
+  meta.name = "robots";
+  meta.content = "noindex, nofollow";
+  document.head.appendChild(meta);
+}
+

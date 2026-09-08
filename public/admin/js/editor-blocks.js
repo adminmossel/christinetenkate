@@ -213,10 +213,20 @@ function editImage(block, patch) {
     { value: "center", label: "Centreren" },
     { value: "right", label: "Rechts (tekst loopt eromheen)" },
   ], (v) => { patch({ align: v }); preview.refresh(); })));
+  const widthLabel = document.createElement("label");
+  widthLabel.textContent = `Breedte: ${block.widthPercent || 100}%`;
   const widthInput = document.createElement("input");
   widthInput.type = "range"; widthInput.min = "20"; widthInput.max = "100"; widthInput.value = block.widthPercent || 100;
-  widthInput.addEventListener("input", () => { patch({ widthPercent: Number(widthInput.value) }); preview.refresh(); });
-  wrap.appendChild(field("Breedte (%)", widthInput));
+  widthInput.addEventListener("input", () => {
+    widthLabel.textContent = `Breedte: ${widthInput.value}%`;
+    patch({ widthPercent: Number(widthInput.value) });
+    preview.refresh();
+  });
+  const widthField = document.createElement("div");
+  widthField.className = "admin-field";
+  widthField.appendChild(widthLabel);
+  widthField.appendChild(widthInput);
+  wrap.appendChild(widthField);
   wrap.appendChild(linkButton(block.link, (link) => { patch({ link }); preview.refresh(); }));
   return wrap;
 }

@@ -7,11 +7,11 @@ import { db } from "./firebase-init.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { initSearch } from "./search.js";
 
-function buildMenuItem(item) {
+function buildMenuItem(item, index = 0) {
   const li = document.createElement("li");
   li.className = "main-nav__item";
+  li.style.setProperty("--stagger", index);
   const a = document.createElement("a");
-  a.textContent = item.label;
   a.href = item.type === "external" ? item.url : `/${(item.slug || "").replace(/^\//, "")}`;
   if (item.type === "external") {
     a.target = "_blank";
@@ -21,12 +21,16 @@ function buildMenuItem(item) {
   if (item.slug && currentSlug === item.slug) {
     a.setAttribute("aria-current", "page");
   }
+  a.innerHTML = `
+    <span class="main-nav__item-label">${item.label}</span>
+    <svg class="main-nav__item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+  `;
   li.appendChild(a);
 
   if (Array.isArray(item.children) && item.children.length) {
     const sub = document.createElement("ul");
     sub.className = "main-nav__submenu";
-    item.children.filter((c) => !c.hidden).forEach((child) => sub.appendChild(buildMenuItem(child)));
+    item.children.filter((c) => !c.hidden).forEach((child, i) => sub.appendChild(buildMenuItem(child, i)));
     li.appendChild(sub);
   }
   return li;
@@ -71,10 +75,11 @@ async function renderHeader(settings) {
     const moreEl = document.getElementById("main-nav-more");
     const ul = document.createElement("ul");
     ul.className = "main-nav__list main-nav__list--more";
-    if (!visible.some((i) => i.type === "page" && i.slug === "home")) {
-      ul.appendChild(buildMenuItem({ label: "Home", type: "page", slug: "home" }));
+    let i = 0;
+    if (!visible.some((it) => it.type === "page" && it.slug === "home")) {
+      ul.appendChild(buildMenuItem({ label: "Home", type: "page", slug: "home" }, i++));
     }
-    visible.forEach((item) => ul.appendChild(buildMenuItem(item)));
+    visible.forEach((item) => ul.appendChild(buildMenuItem(item, i++)));
     moreEl.appendChild(ul);
   } catch (err) {
     console.error("Menu kon niet geladen worden:", err);
