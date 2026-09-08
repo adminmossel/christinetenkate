@@ -313,13 +313,43 @@ function editFile(block, patch) {
   return wrap;
 }
 
+/** Zet een gewone YouTube/Vimeo-kijklink automatisch om naar de vereiste embed-URL. */
+function normalizeEmbedUrl(url) {
+  if (!url) return url;
+  try {
+    const u = new URL(url.trim());
+    if (u.hostname.includes("youtube.com") && u.searchParams.get("v")) {
+      return `https://www.youtube.com/embed/${u.searchParams.get("v")}`;
+    }
+    if (u.hostname === "youtu.be") {
+      return `https://www.youtube.com/embed/${u.pathname.replace("/", "")}`;
+    }
+    if (u.hostname.includes("vimeo.com") && !u.pathname.includes("/video/") && !u.hostname.includes("player.")) {
+      const id = u.pathname.split("/").filter(Boolean).pop();
+      if (id) return `https://player.vimeo.com/video/${id}`;
+    }
+    return url;
+  } catch {
+    return url; // nog geen geldige URL (bijv. tijdens het typen) — gewoon laten staan
+  }
+}
+
 function editEmbed(block, patch) {
   const wrap = document.createElement("div");
-  wrap.appendChild(field("Embed-URL (bijv. YouTube 'insluiten'-link)", textInput(block.url, (v) => patch({ url: v }), "https://www.youtube.com/embed/…")));
-  wrap.appendChild(field("Titel (voor toegankelijkheid)", textInput(block.title, (v) => patch({ title: v }))));
+  const preview = livePreview(() => ({ ...block }));
+  wrap.appendChild(preview.el);
+
+  const urlInput = textInput(block.url, (v) => {
+    const normalized = normalizeEmbedUrl(v);
+    patch({ url: normalized });
+    if (normalized !== v) urlInput.value = normalized; // laat direct zien dat 'ie is omgezet
+    preview.refresh();
+  }, "Plak hier gewoon een normale YouTube- of Vimeo-link");
+  wrap.appendChild(field("Video-URL", urlInput));
+  wrap.appendChild(field("Titel (voor toegankelijkheid)", textInput(block.title, (v) => { patch({ title: v }); preview.refresh(); })));
   const note = document.createElement("p");
   note.style.cssText = "font-size:var(--fs-sm);color:var(--color-ink-soft);";
-  note.textContent = "Let op: gebruik de officiële 'insluiten'/'embed'-link van het platform (bijv. YouTube of Vimeo), geen willekeurige HTML-code — dat is veiliger.";
+  note.textContent = "Een gewone YouTube- of Vimeo-link wordt automatisch omgezet naar de juiste insluit-vorm.";
   wrap.appendChild(note);
   return wrap;
 }

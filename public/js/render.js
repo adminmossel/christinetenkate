@@ -66,7 +66,7 @@ function applyLink(node, link, mediaMap) {
 
 function sanitize(html) {
   const config = {
-    ALLOWED_TAGS: ["b","strong","i","em","u","s","strike","sup","sub","a","br","p","ul","ol","li","blockquote","hr","span"],
+    ALLOWED_TAGS: ["b","strong","i","em","u","s","strike","sup","sub","a","br","p","h1","h2","h3","h4","h5","h6","ul","ol","li","blockquote","hr","span"],
     ALLOWED_ATTR: ["href","target","rel","style"],
     // Staat naast de gebruikelijke veilige schema's (http, https, mailto,
     // tel) ook ons eigen "media:<id>"-schema toe, dat hieronder na het

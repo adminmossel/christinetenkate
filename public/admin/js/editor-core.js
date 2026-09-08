@@ -11,6 +11,15 @@ import {
   serverTimestamp, deleteDoc,
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
+// Kleine, simpele lijn-iconen per bloktype voor het "+ Blok toevoegen"-menu.
+const BLOCK_ICONS = {
+  text: "✎", heading: "𝐇", quote: "❝",
+  image: "🖼", gallery: "▦", file: "📎", embed: "▶",
+  button: "⬭", "contact-form": "✉", faq: "❓",
+  columns: "▥", divider: "―", spacer: "␣",
+  hero: "★", tiles: "▦",
+};
+
 const params = new URLSearchParams(location.search);
 const pageId = params.get("id");
 
@@ -18,6 +27,7 @@ let pageData = null;
 let dirty = false;
 let autosaveTimer = null;
 let currentTab = "edit";
+const collapsedBlockIds = new Set();
 
 async function boot() {
   if (!pageId) { alert("Geen pagina-id opgegeven."); location.href = "/admin/index.html"; return; }
@@ -301,8 +311,10 @@ function renderBlockList(container, blocks, onChange, isTopLevel) {
   function renderBlockItem(block, index) {
     const item = document.createElement("div");
     item.className = "block-item";
+    if (collapsedBlockIds.has(block.id)) item.classList.add("is-collapsed");
     item.draggable = true;
     item.dataset.index = String(index);
+    item.dataset.blockId = block.id;
 
     const header = document.createElement("div");
     header.className = "block-item__header";
@@ -310,6 +322,7 @@ function renderBlockList(container, blocks, onChange, isTopLevel) {
     const actions = document.createElement("span");
     actions.className = "block-item__actions";
     actions.innerHTML = `
+      <button type="button" title="In-/uitklappen" data-act="collapse">${collapsedBlockIds.has(block.id) ? "▸" : "▾"}</button>
       <button type="button" title="Naar boven" data-act="up">↑</button>
       <button type="button" title="Naar beneden" data-act="down">↓</button>
       <button type="button" title="Dupliceren" data-act="dup">⎘</button>
@@ -317,6 +330,18 @@ function renderBlockList(container, blocks, onChange, isTopLevel) {
     `;
     header.appendChild(actions);
     item.appendChild(header);
+    actions.querySelector('[data-act="collapse"]').addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (collapsedBlockIds.has(block.id)) collapsedBlockIds.delete(block.id); else collapsedBlockIds.add(block.id);
+      draw();
+    });
+    // Klikken op de header zelf (buiten de knoppen) klapt ook in/uit — fijn
+    // voor snel herordenen van bijvoorbeeld een lange tegel- of kolomlijst.
+    header.addEventListener("click", (e) => {
+      if (e.target.closest(".block-item__actions")) return;
+      if (collapsedBlockIds.has(block.id)) collapsedBlockIds.delete(block.id); else collapsedBlockIds.add(block.id);
+      draw();
+    });
 
     const body = document.createElement("div");
     body.className = "block-item__body";
@@ -378,27 +403,52 @@ function renderBlockList(container, blocks, onChange, isTopLevel) {
   const addBtn = document.createElement("button");
   addBtn.type = "button";
   addBtn.className = "btn-admin btn-admin--primary";
-  addBtn.textContent = "+ Blok toevoegen";
+  addBtn.innerHTML = `<span class="add-block-menu__plus">+</span> Blok toevoegen`;
   const menu = document.createElement("div");
   menu.className = "add-block-menu__list";
-  menu.style.display = "none";
 
   const library = { ...BLOCK_LIBRARY, ...(isTopLevel && pageData.slug === "home" ? HOME_ONLY_BLOCKS : {}) };
+  const groups = new Map();
   Object.entries(library).forEach(([type, def]) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = def.label;
-    btn.addEventListener("click", () => {
-      blocks.push(def.factory());
-      onChange(blocks);
-      draw();
-      menu.style.display = "none";
-    });
-    menu.appendChild(btn);
+    if (!groups.has(def.group)) groups.set(def.group, []);
+    groups.get(def.group).push([type, def]);
   });
 
-  addBtn.addEventListener("click", () => { menu.style.display = menu.style.display === "none" ? "grid" : "none"; });
-  document.addEventListener("click", (e) => { if (!addWrap.contains(e.target)) menu.style.display = "none"; });
+  groups.forEach((entries, groupName) => {
+    const groupTitle = document.createElement("span");
+    groupTitle.className = "add-block-menu__group";
+    groupTitle.textContent = groupName;
+    menu.appendChild(groupTitle);
+    entries.forEach(([type, def]) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.innerHTML = `<span class="add-block-menu__icon">${BLOCK_ICONS[type] || "▢"}</span> ${def.label}`;
+      btn.addEventListener("click", () => {
+        const newBlock = def.factory();
+        blocks.push(newBlock);
+        onChange(blocks);
+        draw();
+        closeMenu();
+        // Even laten oplichten + naartoe scrollen, zodat duidelijk is dat
+        // het blok is toegevoegd en waar het staat.
+        requestAnimationFrame(() => {
+          const newEl = list.querySelector(`[data-block-id="${newBlock.id}"]`);
+          if (newEl) {
+            newEl.classList.add("is-new");
+            newEl.scrollIntoView({ behavior: "smooth", block: "center" });
+            setTimeout(() => newEl.classList.remove("is-new"), 900);
+          }
+        });
+      });
+      menu.appendChild(btn);
+    });
+  });
+
+  function closeMenu() { menu.classList.remove("is-open"); addBtn.classList.remove("is-open"); }
+  function openMenu() { menu.classList.add("is-open"); addBtn.classList.add("is-open"); }
+
+  addBtn.addEventListener("click", () => { menu.classList.contains("is-open") ? closeMenu() : openMenu(); });
+  document.addEventListener("click", (e) => { if (!addWrap.contains(e.target)) closeMenu(); });
 
   addWrap.appendChild(addBtn);
   addWrap.appendChild(menu);
