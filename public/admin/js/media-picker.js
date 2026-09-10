@@ -16,7 +16,7 @@
 // foto groter is dan 1500 bytes). Zie INSTALLATIE.md, stap 2.7.
 
 import { db, auth } from "../../js/firebase-init.js";
-import { collection, addDoc, doc, getDoc, getDocs, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { collection, addDoc, doc, getDoc, getDocs, deleteDoc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // Ruimte voor de andere velden (naam, type, enz.) en de 33% overhead van
 // base64-codering: een gecomprimeerde foto mag netto max. ~700 KB wegen.
@@ -202,10 +202,28 @@ export function openMediaPicker({ accept = "any" } = {}) {
       items.forEach((media) => {
         const item = document.createElement("div");
         item.className = "media-grid__item";
+        item.style.position = "relative";
         const isImage = media.contentType?.startsWith("image/");
         item.innerHTML = isImage
           ? `<img src="${media.url}" alt="${media.alt || ""}"><span>${media.name}</span>`
           : `<div style="padding:20px;font-size:2rem;">📄</div><span>${media.name}</span>`;
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.title = "Verwijderen uit mediabibliotheek";
+        deleteBtn.textContent = "✕";
+        deleteBtn.style.cssText = "position:absolute;top:4px;right:4px;width:22px;height:22px;border:none;border-radius:50%;background:rgba(29,29,31,0.75);color:#fff;cursor:pointer;font-size:12px;line-height:1;";
+        deleteBtn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          if (!confirm(`"${media.name}" definitief verwijderen uit de mediabibliotheek?`)) return;
+          try {
+            await deleteDoc(doc(db, "media", media.id));
+            renderGrid();
+          } catch (err) {
+            console.error(err);
+            alert("Verwijderen is niet gelukt.");
+          }
+        });
+        item.appendChild(deleteBtn);
         item.addEventListener("click", () => close(media));
         grid.appendChild(item);
       });

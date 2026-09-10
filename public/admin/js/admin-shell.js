@@ -36,7 +36,10 @@ export function renderAdminShell(activeKey, adminProfile, options = {}) {
     <button type="button" class="admin-sidebar__collapse-btn" aria-label="Menu in-/uitklappen" title="Menu in-/uitklappen">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
-    <a class="admin-sidebar__logo" href="/"><span class="admin-sidebar__logo-full">Christine ten Kate</span><span class="admin-sidebar__logo-mini">CtK</span></a>
+    <a class="admin-sidebar__logo" href="/">
+      <img src="/img/logo-blocks.png" alt="Christine ten Kate" class="admin-sidebar__logo-img">
+      <span class="admin-sidebar__logo-full">Christine ten Kate</span>
+    </a>
     <nav>
       ${NAV_ITEMS.map((item) => `<a href="${item.href}" class="${item.key === activeKey ? "is-active" : ""}" title="${item.label}">${ICONS[item.key]}<span>${item.label}</span></a>`).join("")}
       <a href="/" target="_blank" rel="noopener" title="Bekijk site">${ICONS.external}<span>Bekijk site</span></a>

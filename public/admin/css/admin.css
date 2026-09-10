@@ -37,15 +37,13 @@ body.admin {
 .admin-shell { grid-template-columns: 248px 1fr; transition: grid-template-columns var(--transition); }
 .admin-shell.is-sidebar-collapsed { grid-template-columns: 64px 1fr; }
 .admin-shell.is-sidebar-collapsed .admin-sidebar { width: 64px; padding-left: var(--space-2); padding-right: var(--space-2); }
-.admin-shell.is-sidebar-collapsed .admin-sidebar a span:not(.admin-sidebar__logo-mini),
+.admin-shell.is-sidebar-collapsed .admin-sidebar a span,
 .admin-shell.is-sidebar-collapsed .admin-sidebar__logo-full,
 .admin-shell.is-sidebar-collapsed .admin-sidebar__user p { display: none; }
-.admin-shell.is-sidebar-collapsed .admin-sidebar__logo-mini { display: inline; }
 .admin-shell.is-sidebar-collapsed .admin-sidebar a { justify-content: center; }
 .admin-shell.is-sidebar-collapsed .admin-sidebar__collapse-btn svg { transform: rotate(180deg); }
 .admin-shell.is-sidebar-collapsed .admin-sidebar__user { display: flex; flex-direction: column; align-items: center; }
 
-.admin-sidebar__logo-mini { display: none; }
 .admin-sidebar__collapse-btn {
   align-self: flex-end;
   background: rgba(255,255,255,0.10);
@@ -68,8 +66,18 @@ body.admin {
   color: var(--color-white);
   text-decoration: none;
   margin-bottom: var(--space-5);
-  display: block;
-  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.admin-sidebar__logo-img {
+  height: 34px;
+  width: 34px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #FFFFFF;
+  padding: 3px;
+  flex-shrink: 0;
 }
 .admin-sidebar nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
 .admin-sidebar a {
@@ -149,22 +157,23 @@ table.admin-table { width: 100%; border-collapse: collapse; }
 .btn-admin {
   font-size: var(--fs-sm);
   font-weight: 600;
-  padding: 7px 16px;
+  padding: 8px 18px;
   border-radius: 999px;
-  border: 2px solid #1D1D1F;
+  border: 1.5px solid var(--color-primary);
   background: #FFFFFF;
-  color: #1D1D1F;
+  color: var(--color-primary);
   text-decoration: none;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
 }
-.btn-admin:hover { background: #1D1D1F; color: #FFFFFF; }
-.btn-admin--primary { background: var(--color-primary); color: #FFFFFF; border-color: var(--color-primary); }
+.btn-admin:hover { background: var(--color-primary); color: #FFFFFF; box-shadow: 0 4px 14px rgba(0,113,227,0.28); }
+.btn-admin--primary { background: var(--color-primary); color: #FFFFFF; border-color: var(--color-primary); box-shadow: 0 2px 8px rgba(0,113,227,0.3); }
 .btn-admin--primary:hover { background: var(--color-primary-dark); border-color: var(--color-primary-dark); }
 .btn-admin--danger { color: var(--color-error); border-color: var(--color-error); background: #FFFFFF; }
-.btn-admin--danger:hover { background: var(--color-error); color: #FFFFFF; }
+.btn-admin--danger:hover { background: var(--color-error); color: #FFFFFF; box-shadow: 0 4px 14px rgba(215,0,21,0.28); }
 
 /* ============ Formuliervelden ============ */
 .admin-field { margin-bottom: var(--space-3); }

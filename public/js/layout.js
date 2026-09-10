@@ -58,14 +58,20 @@ async function renderHeader(settings) {
 
   const toggle = header.querySelector(".nav-toggle");
   const more = header.querySelector("#main-nav-more");
+  function closeMenu() {
+    more.classList.remove("is-open");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.classList.remove("is-open");
+  }
   toggle.addEventListener("click", () => {
     const isOpen = more.classList.toggle("is-open");
     toggle.setAttribute("aria-expanded", String(isOpen));
     toggle.classList.toggle("is-open", isOpen);
   });
-  document.addEventListener("click", (e) => {
-    if (!header.contains(e.target)) { more.classList.remove("is-open"); toggle.setAttribute("aria-expanded", "false"); toggle.classList.remove("is-open"); }
-  });
+  // Klikken op de donkere achtergrond zelf (niet op het menupaneel erin)
+  // sluit het uitklapmenu.
+  more.addEventListener("click", (e) => { if (e.target === more) closeMenu(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
 
   try {
     const menuSnap = await getDoc(doc(db, "menu", "main"));

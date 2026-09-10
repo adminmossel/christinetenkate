@@ -71,6 +71,25 @@ const PAGES = [
           { title: "Referenties", text: "Ervaringen van eerdere opdrachtgevers.", link: { type: "page", value: "referenties" } },
         ],
       },
+      spacer(10),
+      heading("Waarom Christine ten Kate", 2, "center"),
+      { id: bid(), type: "columns", columns: 3, items: [
+        { blocks: [heading("Praktijkgericht", 4), paragraph("Voorbeeldtekst — geen droge theorie, maar direct toepasbaar op de groepen van morgen.")] },
+        { blocks: [heading("Persoonlijke aanpak", 4), paragraph("Voorbeeldtekst — elk team en elke organisatie is anders; het aanbod sluit daarop aan.")] },
+        { blocks: [heading("Erkend & ervaren", 4), paragraph("Voorbeeldtekst — CRKBO-geregistreerd, met jarenlange ervaring in de kinderopvang.")] },
+      ] },
+      spacer(10),
+      quote("Voorbeeldcitaat — een korte, krachtige reactie van een opdrachtgever komt hier mooi tot z'n recht op de homepage.", "Voorbeeld — naam opdrachtgever"),
+      spacer(10),
+      {
+        id: bid(), type: "hero",
+        eyebrow: "",
+        title: "Klaar om samen te werken?",
+        lead: "Neem gerust contact op voor een vrijblijvend gesprek over de mogelijkheden.",
+        imageMediaId: null, imageAlt: "",
+        buttonText: "Stel je vraag",
+        buttonLink: { type: "page", value: "contact" },
+      },
     ],
   },
   {
@@ -86,8 +105,8 @@ const PAGES = [
       heading("Mijn werkwijze", 2),
       paragraph("Leg hier uit hoe een traject er bij jou uitziet: begin je altijd met een intakegesprek? Werk je met vaste modules of maatwerk? Sta je ook na afloop van een training nog beschikbaar voor vragen?"),
       { id: bid(), type: "columns", columns: 2, items: [
-        { blocks: [paragraph("<strong>Praktisch</strong>")] },
-        { blocks: [paragraph("<strong>Persoonlijk</strong>")] },
+        { blocks: [heading("Praktisch", 4), { id: bid(), type: "text", html: "<ul><li>Voorbeeld — intake op locatie of online;</li><li>Voorbeeld — flexibel in te plannen;</li><li>Voorbeeld — heldere offerte vooraf.</li></ul>" }] },
+        { blocks: [heading("Persoonlijk", 4), { id: bid(), type: "text", html: "<ul><li>Voorbeeld — aandacht voor de praktijksituatie van het team;</li><li>Voorbeeld — laagdrempelig contact;</li><li>Voorbeeld — nazorg na afloop.</li></ul>" }] },
       ] },
       divider(),
       heading("In het kort", 3),
@@ -97,6 +116,10 @@ const PAGES = [
         <li>Werkzaam als trainer, docent én pedagogisch adviseur;</li>
         <li>Persoonlijke, praktijkgerichte aanpak.</li>
       </ul>` },
+      spacer(10),
+      heading("Mijn missie", 2),
+      { id: bid(), type: "quote", text: "Voorbeeldtekst — een korte, persoonlijke missiezin die laat zien waar je voor staat, werkt hier vaak sterker dan een lang verhaal.", cite: "" },
+      { id: bid(), type: "button", text: "Bekijk het cursusaanbod", align: "left", style: "outline", link: { type: "page", value: "cursussen-workshops" } },
     ],
   },
   {
@@ -112,14 +135,25 @@ const PAGES = [
         { title: "Werken met baby's en dreumesen", text: "Voorbeeld — korte omschrijving van inhoud, duur en doelgroep.", link: null },
         { title: "Omgaan met grensoverschrijdend gedrag", text: "Voorbeeld — korte omschrijving van inhoud, duur en doelgroep.", link: null },
       ]),
+      spacer(10),
       heading("Hoe een training eruitziet", 2),
       paragraph("Beschrijf hier de opbouw van een gemiddelde training: duur, groepsgrootte, locatie (op locatie bij de organisatie, of elders), en of er een certificaat/bewijs van deelname wordt uitgereikt."),
+      { id: bid(), type: "columns", columns: 3, items: [
+        { blocks: [heading("1. Intake", 4), paragraph("Voorbeeldtekst — korte kennismaking en inventarisatie van de leervraag.")] },
+        { blocks: [heading("2. Training", 4), paragraph("Voorbeeldtekst — interactieve bijeenkomst(en), praktijkgericht en op maat.")] },
+        { blocks: [heading("3. Nazorg", 4), paragraph("Voorbeeldtekst — evaluatie en eventueel een terugkomdag.")] },
+      ] },
+      divider(),
       heading("Veelgestelde vragen", 2),
       faq([
         { question: "Voor wie zijn de trainingen bedoeld?", answer: "Voorbeeldantwoord — bijvoorbeeld: voor pedagogisch medewerkers, teamleiders en locatiemanagers in de kinderopvang." },
         { question: "Kan een training op maat gemaakt worden?", answer: "Voorbeeldantwoord — leg hier uit of en hoe trainingen aangepast worden aan de wensen van een organisatie." },
         { question: "Wat zijn de kosten?", answer: "Voorbeeldantwoord — vul hier je tarieven of prijsindicatie in, of verwijs naar een offerte op maat." },
+        { question: "Hoeveel deelnemers kunnen meedoen?", answer: "Voorbeeldantwoord — geef hier een indicatie van de minimale/maximale groepsgrootte." },
+        { question: "Krijgen deelnemers een certificaat?", answer: "Voorbeeldantwoord — leg uit of er een bewijs van deelname of certificaat wordt uitgereikt." },
       ]),
+      spacer(10),
+      { id: bid(), type: "button", text: "Vraag het cursusaanbod aan", align: "center", style: "solid", link: { type: "page", value: "contact" } },
     ],
   },
   {
@@ -131,14 +165,21 @@ const PAGES = [
       placeholderNotice("Plaatshouder-tekst — beschrijf hier het aanbod en de werkwijze rondom ouderavonden. Vul de voorbeeldonderwerpen hieronder aan met jouw eigen thema's."),
       paragraph("Naast trainingen voor pedagogisch medewerkers verzorg ik ook interactieve ouderavonden. Deze avonden zijn bedoeld om ouders en het team samen in gesprek te laten gaan over de ontwikkeling en opvoeding van kinderen."),
       heading("Mogelijke onderwerpen", 2),
-      { id: bid(), type: "text", html: `<ul>
-        <li>Voorbeeldonderwerp — gehechtheid en een veilige basis;</li>
-        <li>Voorbeeldonderwerp — grenzen stellen op een positieve manier;</li>
-        <li>Voorbeeldonderwerp — de overstap naar de basisschool;</li>
-        <li>Voorbeeldonderwerp — schermgebruik en jonge kinderen.</li>
-      </ul>` },
+      tilesBlock([
+        { title: "Gehechtheid", text: "Voorbeeldonderwerp — een veilige basis voor jonge kinderen.", link: null },
+        { title: "Grenzen stellen", text: "Voorbeeldonderwerp — positief en consequent opvoeden.", link: null },
+        { title: "Naar de basisschool", text: "Voorbeeldonderwerp — de overstap goed voorbereiden.", link: null },
+        { title: "Schermgebruik", text: "Voorbeeldonderwerp — mediaopvoeding bij jonge kinderen.", link: null },
+      ]),
+      spacer(10),
       heading("Werkwijze", 2),
       paragraph("Beschrijf hier hoe een ouderavond eruitziet: duur, interactieve werkvormen, en of de avond samen met het team wordt voorbereid."),
+      heading("Veelgestelde vragen", 2),
+      faq([
+        { question: "Hoe lang duurt een ouderavond?", answer: "Voorbeeldantwoord — geef hier een gemiddelde duur aan, bijvoorbeeld anderhalf tot twee uur." },
+        { question: "Wordt de avond samen met het team voorbereid?", answer: "Voorbeeldantwoord — leg uit hoe de afstemming met de organisatie vooraf verloopt." },
+        { question: "Kan het onderwerp op maat gekozen worden?", answer: "Voorbeeldantwoord — geef aan of thema's aangepast kunnen worden aan de wensen van de organisatie/ouders." },
+      ]),
       spacer(10),
       quote("Voorbeeldcitaat van een organisatie die een ouderavond heeft afgenomen.", "Voorbeeld — naam organisatie"),
     ],
@@ -151,12 +192,19 @@ const PAGES = [
       heading("Referenties", 1),
       placeholderNotice("Plaatshouder — vervang deze voorbeeldcitaten door échte reacties van opdrachtgevers (met hun toestemming)."),
       paragraph("Hieronder een aantal reacties van organisaties waarmee ik heb samengewerkt."),
-      quote("Een fijne, deskundige trainer die goed aansluit bij de praktijk.", "Voorbeeld — naam opdrachtgever, kinderdagverblijf"),
-      quote("De training was praktisch, interactief en direct toepasbaar op de groep.", "Voorbeeld — naam opdrachtgever, BSO"),
-      quote("Prettige samenwerking van intake tot evaluatie.", "Voorbeeld — naam opdrachtgever, peuterspeelzaal"),
+      { id: bid(), type: "columns", columns: 2, items: [
+        { blocks: [quote("Een fijne, deskundige trainer die goed aansluit bij de praktijk.", "Voorbeeld — naam opdrachtgever, kinderdagverblijf")] },
+        { blocks: [quote("De training was praktisch, interactief en direct toepasbaar op de groep.", "Voorbeeld — naam opdrachtgever, BSO")] },
+      ] },
+      { id: bid(), type: "columns", columns: 2, items: [
+        { blocks: [quote("Prettige samenwerking van intake tot evaluatie.", "Voorbeeld — naam opdrachtgever, peuterspeelzaal")] },
+        { blocks: [quote("Duidelijke communicatie en een training die echt bij ons team paste.", "Voorbeeld — naam opdrachtgever, gastouderbureau")] },
+      ] },
       divider(),
       heading("Eerdere opdrachtgevers", 2),
-      paragraph("Voorbeeldtekst — noem hier (met toestemming) de namen of logo's van organisaties waarvoor je gewerkt hebt, bijvoorbeeld via een galerij-blok."),
+      paragraph("Voorbeeldtekst — noem hier (met toestemming) de namen van organisaties waarvoor je gewerkt hebt, of voeg een galerij met logo's toe via het '+ Blok'-menu."),
+      spacer(10),
+      { id: bid(), type: "button", text: "Ook interesse? Neem contact op", align: "left", style: "solid", link: { type: "page", value: "contact" } },
     ],
   },
   {
@@ -166,17 +214,26 @@ const PAGES = [
     blocks: [
       heading("Handige links", 1),
       placeholderNotice("Plaatshouder — voeg hier links toe naar handige, betrouwbare websites voor pedagogisch medewerkers en ouders. Gebruik bij een tekst- of knopblok de knop 'Link instellen' om naar een externe site te linken."),
-      heading("Voor pedagogisch medewerkers", 2),
-      { id: bid(), type: "text", html: `<ul>
-        <li>Voorbeeldlink — brancheorganisatie kinderopvang;</li>
-        <li>Voorbeeldlink — kennisplatform pedagogiek;</li>
-        <li>Voorbeeldlink — CRKBO-register.</li>
-      </ul>` },
-      heading("Voor ouders", 2),
-      { id: bid(), type: "text", html: `<ul>
-        <li>Voorbeeldlink — informatie over de ontwikkeling van jonge kinderen;</li>
-        <li>Voorbeeldlink — opvoedadvies.</li>
-      </ul>` },
+      { id: bid(), type: "columns", columns: 2, items: [
+        { blocks: [
+          heading("Voor pedagogisch medewerkers", 3),
+          { id: bid(), type: "text", html: `<ul>
+            <li>Voorbeeldlink — brancheorganisatie kinderopvang;</li>
+            <li>Voorbeeldlink — kennisplatform pedagogiek;</li>
+            <li>Voorbeeldlink — CRKBO-register.</li>
+          </ul>` },
+        ] },
+        { blocks: [
+          heading("Voor ouders", 3),
+          { id: bid(), type: "text", html: `<ul>
+            <li>Voorbeeldlink — informatie over de ontwikkeling van jonge kinderen;</li>
+            <li>Voorbeeldlink — opvoedadvies;</li>
+            <li>Voorbeeldlink — het Centrum voor Jeugd en Gezin.</li>
+          </ul>` },
+        ] },
+      ] },
+      divider(),
+      paragraph("Mis je een link, of wil je zelf een handig document (zoals een informatiefolder) beschikbaar maken? Voeg die toe via een 'Bestand'-blok."),
     ],
   },
   {
@@ -187,9 +244,18 @@ const PAGES = [
       heading("Contact", 1),
       paragraph("Neem gerust contact op via onderstaand formulier, telefoon of e-mail — ik reageer meestal binnen enkele werkdagen."),
       { id: bid(), type: "columns", columns: 2, items: [
-        { blocks: [paragraph("<strong>Christine ten Kate</strong><br>Zuiderlaan 199<br>7944 EE Meppel<br>T 0522 - 24 43 66<br>M 06 - 30 86 09 63<br>E info@christinetenkate.nl<br>KvK-nr. 60855851")] },
+        { blocks: [
+          heading("Gegevens", 4),
+          paragraph("<strong>Christine ten Kate</strong><br>Zuiderlaan 199<br>7944 EE Meppel<br>T 0522 - 24 43 66<br>M 06 - 30 86 09 63<br>E info@christinetenkate.nl<br>KvK-nr. 60855851"),
+        ] },
         { blocks: [{ id: bid(), type: "contact-form", buttonText: "Versturen" }] },
       ] },
+      spacer(10),
+      heading("Veelgestelde vragen", 2),
+      faq([
+        { question: "Hoe snel krijg ik een reactie?", answer: "Voorbeeldantwoord — geef hier aan binnen welke termijn je meestal reageert." },
+        { question: "Kan ik ook langskomen?", answer: "Voorbeeldantwoord — geef aan of een kennismakingsgesprek op locatie mogelijk is." },
+      ]),
     ],
   },
   {
