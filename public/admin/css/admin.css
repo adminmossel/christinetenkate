@@ -414,6 +414,84 @@ table.admin-table { width: 100%; border-collapse: collapse; }
   .editor-canvas { max-width: none; }
 }
 
+/* ============ Opslaanstatus in de editor ============ */
+.save-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+.save-status:empty { display: none; }
+.save-status__dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.save-status--dirty { color: #9A6700; background: #FFF6E0; }
+.save-status--dirty .save-status__dot { background: #E2963F; animation: save-status-pulse 1.2s ease infinite; }
+.save-status--saving { color: var(--color-primary); background: var(--color-accent-soft); }
+.save-status--saving .save-status__dot { background: var(--color-primary); animation: save-status-spin 800ms linear infinite; border-radius: 2px; }
+.save-status--saved { color: var(--color-success); background: #E6F6EA; animation: save-status-pop 260ms ease; }
+.save-status--saved .save-status__dot { background: var(--color-success); }
+.save-status--error { color: var(--color-error); background: #FCE4E4; }
+.save-status--error .save-status__dot { background: var(--color-error); }
+
+@keyframes save-status-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes save-status-spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+@keyframes save-status-pop { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.editor-mobile-frame {
+  max-width: 390px;
+  margin: 0 auto;
+  border: 10px solid #1D1D1F;
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+  position: relative;
+}
+.editor-mobile-frame::before {
+  content: "";
+  position: absolute;
+  top: 10px; left: 50%; transform: translateX(-50%);
+  width: 70px; height: 18px;
+  background: #1D1D1F;
+  border-radius: 0 0 12px 12px;
+  z-index: 5;
+}
+.editor-mobile-frame .site-preview { max-height: 70vh; overflow-y: auto; padding-top: 34px; }
+
+/* ============ Bijsnijden ============ */
+.crop-stage {
+  position: relative;
+  max-height: 60vh;
+  overflow: hidden;
+  background: #111;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  user-select: none;
+}
+.crop-stage img { max-width: 100%; max-height: 60vh; display: block; pointer-events: none; }
+.crop-box {
+  position: absolute;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 0 0 2000px rgba(0,0,0,0.55);
+  cursor: move;
+}
+.crop-handle {
+  position: absolute;
+  width: 16px; height: 16px;
+  background: #FFFFFF;
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.crop-handle[data-h="nw"] { top: 0; left: 0; cursor: nwse-resize; }
+.crop-handle[data-h="ne"] { top: 0; left: 100%; cursor: nesw-resize; }
+.crop-handle[data-h="sw"] { top: 100%; left: 0; cursor: nesw-resize; }
+.crop-handle[data-h="se"] { top: 100%; left: 100%; cursor: nwse-resize; }
+
 /* ============ Statistieken ============ */
 .stats-cards {
   display: grid;

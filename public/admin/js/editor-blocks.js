@@ -6,7 +6,7 @@
 // toetsaanslag) en plant een autosave in.
 
 import { buildRichToolbar } from "./rich-toolbar.js";
-import { openMediaPicker, fetchMediaMap } from "./media-picker.js";
+import { openMediaPicker, fetchMediaMap, openCropTool } from "./media-picker.js";
 import { openLinkPicker } from "./link-picker.js";
 import { renderBlocks, collectMediaIds } from "../../js/render.js";
 
@@ -34,6 +34,14 @@ export const HOME_ONLY_BLOCKS = {
   hero: { label: "Hero (bovenaan homepage)", group: "Homepage", factory: () => ({ id: newId(), type: "hero", eyebrow: "", title: "Welkom", lead: "", imageMediaId: null, imageAlt: "", buttonText: "", buttonLink: null }) },
   tiles: { label: "Tegels (samenvattingskaarten)", group: "Homepage", factory: () => ({ id: newId(), type: "tiles", items: [{ title: "Titel", text: "Korte omschrijving.", link: null }] }) },
 };
+
+function showCropSuccessHint(nearEl) {
+  const hint = document.createElement("span");
+  hint.textContent = " ✓ Bijgesneden";
+  hint.style.cssText = "color:var(--color-success);font-size:var(--fs-sm);font-weight:600;margin-left:8px;animation:save-status-pop 260ms ease;";
+  nearEl.insertAdjacentElement("afterend", hint);
+  setTimeout(() => hint.remove(), 2200);
+}
 
 function field(labelText, inputEl) {
   const wrap = document.createElement("div");
@@ -206,6 +214,26 @@ function editImage(block, patch) {
     patch({ mediaId: media.id, alt: block.alt || media.alt || "" });
     preview.refresh();
   }));
+
+  const cropBtn = document.createElement("button");
+  cropBtn.type = "button";
+  cropBtn.className = "btn-admin";
+  cropBtn.style.marginBottom = "12px";
+  cropBtn.textContent = "✂ Bijsnijden";
+  cropBtn.addEventListener("click", async () => {
+    if (!block.mediaId) { alert("Kies eerst een afbeelding."); return; }
+    const map = await fetchMediaMap([block.mediaId]);
+    const current = map[block.mediaId];
+    if (!current) return;
+    const cropped = await openCropTool(current.url, current.name);
+    if (cropped) {
+      patch({ mediaId: cropped.id, alt: block.alt || "" });
+      preview.refresh();
+      showCropSuccessHint(cropBtn);
+    }
+  });
+  wrap.appendChild(cropBtn);
+
   wrap.appendChild(field("Alt-tekst (voor screenreaders en SEO)", textInput(block.alt, (v) => { patch({ alt: v }); preview.refresh(); })));
   wrap.appendChild(field("Bijschrift (optioneel)", textInput(block.caption, (v) => { patch({ caption: v }); preview.refresh(); })));
   wrap.appendChild(field("Uitlijning", selectInput(block.align || "center", [

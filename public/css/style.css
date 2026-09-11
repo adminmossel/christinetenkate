@@ -4,6 +4,46 @@
   Werkt samen met tokens.css (moet er vóór geladen worden).
 */
 
+/* ============ Laadscherm / welkomanimatie ============ */
+#site-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  background: var(--color-bg);
+  transition: opacity 420ms ease, visibility 420ms ease;
+}
+#site-loader.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.site-loader__logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  animation: loader-breathe 1.6s ease-in-out infinite;
+}
+.site-loader__text {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--color-teal);
+  font-size: var(--fs-md);
+  opacity: 0;
+  animation: loader-text-in 600ms ease 300ms forwards;
+}
+@keyframes loader-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12) rotate(-4deg); }
+}
+@keyframes loader-text-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-loader__logo { animation: none; }
+}
+
 /* ============ Skip link (toegankelijkheid) ============ */
 .skip-link {
   position: absolute;
@@ -111,82 +151,73 @@
 .nav-toggle.is-open svg { transform: rotate(90deg); }
 .nav-toggle svg { width: 18px; height: 18px; pointer-events: none; transition: transform var(--transition); }
 
-/* Het uitklapmenu — een volledig scherm-overlay in plaats van een klein
-   dropdownvakje, zodat het nooit meer van het scherm afvalt en lekker
-   ruimtelijk aanvoelt. */
+/* Het uitklapmenu — een paneel dat vanaf rechts inschuift, in plaats van
+   een overlay in het midden. */
 .main-nav__more {
   display: none;
   position: fixed;
   inset: 0;
   z-index: 200;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 110px var(--space-3) var(--space-4);
-  background: rgba(31, 46, 39, 0.35);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(31, 46, 39, 0.32);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
-.main-nav__more.is-open { display: flex; animation: nav-backdrop-in 240ms ease; }
-.main-nav__more::before {
-  /* De kliklaag; het echte paneel zit los eronder in de HTML-structuur (het is de ul zelf) */
-  content: none;
-}
+.main-nav__more.is-open { display: block; animation: nav-backdrop-in 260ms ease; }
 .main-nav__list--more {
   list-style: none;
   margin: 0;
-  padding: 12px;
+  padding: 100px 14px 28px;
   display: flex;
   flex-direction: column;
-  background: var(--color-white);
-  border-radius: 28px;
-  box-shadow: var(--shadow-lg);
+  background: var(--color-bg);
+  height: 100%;
   width: 100%;
-  max-width: 420px;
-  max-height: calc(100vh - 150px);
+  max-width: 400px;
+  margin-left: auto;
+  box-shadow: -24px 0 60px rgba(0,0,0,0.18);
   overflow-y: auto;
-  animation: nav-panel-in 280ms cubic-bezier(0.2,0.8,0.2,1);
+  animation: nav-panel-slide-in 340ms cubic-bezier(0.19,1,0.22,1);
 }
 .main-nav__item + .main-nav__item { border-top: 1px solid var(--color-line); }
 .main-nav__list--more a {
-  padding: 16px 18px;
+  padding: 18px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   text-decoration: none;
   color: var(--color-ink);
   font-family: var(--font-display);
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 500;
   border-radius: 18px;
   transition: background var(--transition), color var(--transition), padding-left var(--transition);
   opacity: 0;
-  animation: menu-item-in 320ms ease forwards;
-  animation-delay: calc(var(--stagger, 0) * 45ms + 80ms);
+  animation: menu-item-in 380ms ease forwards;
+  animation-delay: calc(var(--stagger, 0) * 55ms + 160ms);
 }
-.main-nav__list--more a:hover { background: var(--color-bg-soft); color: var(--color-primary); padding-left: 24px; }
+.main-nav__list--more a:hover { background: var(--color-white); color: var(--color-primary); padding-left: 20px; }
 .main-nav__list--more a:hover .main-nav__item-arrow { opacity: 1; transform: translateX(0); }
-.main-nav__list--more a[aria-current="page"] { color: var(--color-primary); }
-.main-nav__item-arrow { width: 20px; height: 20px; flex-shrink: 0; opacity: 0; transform: translateX(-4px); transition: opacity var(--transition), transform var(--transition); color: var(--color-accent); }
+.main-nav__list--more a[aria-current="page"] { color: var(--color-accent); }
+.main-nav__item-arrow { width: 22px; height: 22px; flex-shrink: 0; opacity: 0; transform: translateX(-6px); transition: opacity var(--transition), transform var(--transition); color: var(--color-accent); }
 .main-nav__item-label::after { content: none; }
 .main-nav__submenu { list-style: none; margin: 4px 0 4px 14px; padding: 0; }
-.main-nav__submenu a { font-size: 1.05rem; padding: 12px 16px; }
+.main-nav__submenu a { font-size: 1.1rem; padding: 12px 14px; }
 
 @keyframes nav-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes nav-panel-in {
-  from { opacity: 0; transform: translateY(-16px) scale(0.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes nav-panel-slide-in {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 @keyframes menu-item-in {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @media (max-width: 640px) {
   .site-header__island { max-width: none; padding-left: 16px; }
   .nav-toggle span { display: none; }
   .nav-toggle { width: 40px; padding: 0; }
-  .main-nav__more { padding: 90px var(--space-3) var(--space-3); }
-  .main-nav__list--more { max-height: calc(100vh - 120px); }
+  .main-nav__list--more { max-width: none; padding-top: 90px; }
 }
 @keyframes nav-drop {
   from { opacity: 0; transform: translateY(-6px); }
@@ -311,6 +342,19 @@
 /* ============ Content-blokken (gerenderd vanuit de editor) ============ */
 .content-blocks { padding: var(--space-4) 0 var(--space-6); }
 .content-blocks > * + * { margin-top: var(--space-4); }
+.content-blocks > * { animation: content-fade-in 480ms ease both; }
+.content-blocks > *:nth-child(1) { animation-delay: 0ms; }
+.content-blocks > *:nth-child(2) { animation-delay: 60ms; }
+.content-blocks > *:nth-child(3) { animation-delay: 120ms; }
+.content-blocks > *:nth-child(4) { animation-delay: 180ms; }
+.content-blocks > *:nth-child(n+5) { animation-delay: 220ms; }
+@keyframes content-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .content-blocks > * { animation: none; }
+}
 
 /* Op de homepage (zonder omringende .container) krijgen alle blokken
    behalve de hero zelf de standaard leesbreedte en zijmarges. */

@@ -48,6 +48,7 @@ async function boot() {
 }
 
 function renderShell(main) {
+  document.title = `${pageData.title || "Naamloos"} — Bewerken — Beheer`;
   main.innerHTML = `
     <div class="editor-topbar">
       <div class="admin-header" style="margin-bottom:var(--space-3);">
@@ -60,7 +61,7 @@ function renderShell(main) {
           </div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <span id="autosave-indicator" style="font-size:var(--fs-sm);color:var(--color-ink-soft);"></span>
+          <span id="autosave-indicator" class="save-status"></span>
           <span class="status-pill status-pill--${pageData.status}" id="status-pill">${pageData.status === "published" ? "Gepubliceerd" : "Concept"}</span>
           <button class="btn-admin" id="open-settings-btn" title="SEO en versiegeschiedenis" aria-label="Pagina-instellingen">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -74,6 +75,10 @@ function renderShell(main) {
       <div class="editor-tabs">
         <button type="button" class="is-active" data-tab="edit">Bewerken</button>
         <button type="button" data-tab="preview">Voorbeeld</button>
+        <button type="button" data-tab="preview-mobile" title="Voorbeeld op mobiel formaat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          Mobiel
+        </button>
       </div>
     </div>
 
@@ -118,7 +123,7 @@ function renderShell(main) {
     });
   });
 
-  document.getElementById("page-title-input").addEventListener("input", (e) => { pageData.title = e.target.value; markDirty(); });
+  document.getElementById("page-title-input").addEventListener("input", (e) => { pageData.title = e.target.value; document.title = `${pageData.title || "Naamloos"} — Bewerken — Beheer`; markDirty(); });
   document.getElementById("page-slug-input").addEventListener("change", onSlugChange);
   document.getElementById("seo-title").addEventListener("input", (e) => { pageData.seo.title = e.target.value; markDirty(); });
   document.getElementById("seo-description").addEventListener("input", (e) => { pageData.seo.description = e.target.value; markDirty(); });
@@ -164,10 +169,16 @@ async function onSlugChange(e) {
   markDirty();
 }
 
+function setSaveStatus(state, text) {
+  const indicator = document.getElementById("autosave-indicator");
+  if (!indicator) return;
+  indicator.className = `save-status save-status--${state}`;
+  indicator.innerHTML = `<span class="save-status__dot"></span>${text}`;
+}
+
 function markDirty() {
   dirty = true;
-  const indicator = document.getElementById("autosave-indicator");
-  if (indicator) indicator.textContent = "Niet-opgeslagen wijzigingen…";
+  setSaveStatus("dirty", "Niet-opgeslagen wijzigingen");
   clearTimeout(autosaveTimer);
   autosaveTimer = setTimeout(() => saveNow(false), 2500);
 }
@@ -175,6 +186,7 @@ function markDirty() {
 async function saveNow(isPublishAction) {
   clearTimeout(autosaveTimer);
   const admin = getCurrentAdmin();
+  setSaveStatus("saving", "Opslaan…");
   try {
     await updateDoc(doc(db, "pages", pageData.id), {
       title: pageData.title,
@@ -186,11 +198,11 @@ async function saveNow(isPublishAction) {
       updatedBy: admin?.email || null,
     });
     dirty = false;
-    const indicator = document.getElementById("autosave-indicator");
-    if (indicator) indicator.textContent = `Opgeslagen om ${new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })}`;
+    setSaveStatus("saved", `Opgeslagen om ${new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })}`);
     if (!isPublishAction) showToast("Concept opgeslagen.");
   } catch (err) {
     console.error(err);
+    setSaveStatus("error", "Opslaan mislukt");
     showToast("Opslaan mislukt. Controleer je internetverbinding.", true);
   }
 }
@@ -279,11 +291,17 @@ function renderCanvas() {
   const canvas = document.getElementById("editor-canvas");
   canvas.innerHTML = "";
 
-  if (currentTab === "preview") {
+  if (currentTab === "preview" || currentTab === "preview-mobile") {
+    const frame = document.createElement("div");
+    frame.className = currentTab === "preview-mobile" ? "editor-mobile-frame" : "";
+    const previewOuter = document.createElement("div");
+    previewOuter.className = "site-preview";
     const previewWrap = document.createElement("div");
     previewWrap.className = "content-blocks";
     previewWrap.innerHTML = `<p class="state-message">Voorbeeld wordt geladen…</p>`;
-    canvas.appendChild(previewWrap);
+    previewOuter.appendChild(previewWrap);
+    frame.appendChild(previewOuter);
+    canvas.appendChild(frame);
     fetchMediaMap(collectMediaIds(pageData.blocks)).then((mediaMap) => {
       renderBlocks(pageData.blocks, previewWrap, mediaMap);
     });

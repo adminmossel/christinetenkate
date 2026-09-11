@@ -38,6 +38,7 @@ export function requireAdmin() {
           return;
         }
         cachedAdminProfile = { uid: user.uid, email: user.email, ...adminDoc.data() };
+        revealPage();
         resolve(cachedAdminProfile);
       } catch (err) {
         console.error("Kon beheerrechten niet controleren:", err);
@@ -45,6 +46,11 @@ export function requireAdmin() {
       }
     });
   });
+}
+
+/** Maakt de pagina-inhoud pas zichtbaar nadat beheerrechten écht bevestigd zijn. */
+function revealPage() {
+  document.getElementById("auth-gate-style")?.remove();
 }
 
 function redirectToLogin() {

@@ -67,10 +67,14 @@ function showNotFound() {
   `;
 }
 
+function hideLoader() {
+  const loader = document.getElementById("site-loader");
+  if (loader) loader.classList.add("is-hidden");
+}
+
 async function loadPage() {
   const slug = currentSlug();
   const content = document.getElementById("page-content");
-  content.innerHTML = `<p class="state-message">Pagina wordt geladen…</p>`;
 
   try {
     const q = query(
@@ -83,9 +87,11 @@ async function loadPage() {
     if (snap.empty) {
       if (slug === "home") {
         content.innerHTML = `<div class="state-message"><h1>Welkom</h1><p>De homepage is nog niet ingesteld. Ga naar het admin-paneel om de pagina met slug "home" te publiceren.</p></div>`;
+        hideLoader();
         return;
       }
       showNotFound();
+      hideLoader();
       return;
     }
 
@@ -95,9 +101,11 @@ async function loadPage() {
     const mediaMap = await fetchMediaMap(collectMediaIds(page.blocks || []));
     renderBlocks(page.blocks || [], content, mediaMap);
     initContactForms();
+    hideLoader();
   } catch (err) {
     console.error("Pagina kon niet geladen worden:", err);
     content.innerHTML = `<p class="state-message">Er ging iets mis bij het laden van deze pagina. Probeer de pagina te verversen.</p>`;
+    hideLoader();
   }
 }
 
@@ -108,4 +116,14 @@ await initLayout();
 initCookieBanner();
 trackVisit();
 loadPage();
+
+// Noodstop: als er ooit iets vastloopt, verdwijnt het laadscherm sowieso
+// na een paar seconden — nooit een eindeloos "laden"-scherm.
+setTimeout(hideLoader, 6000);
+
+// Registreert de service worker zodat Chrome de site als installeerbare
+// app herkent (zie public/sw.js — cachet bewust niets).
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js").catch((err) => console.error("Service worker registratie mislukt:", err));
+}
 

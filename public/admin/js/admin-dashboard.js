@@ -130,9 +130,81 @@ function actionsFor(id, page) {
   return wrap;
 }
 
+let tplIdCounter = 0;
+function tplId() { return `tpl${Date.now()}${tplIdCounter++}`; }
+
+const PAGE_TEMPLATES = {
+  empty: { label: "Leeg", description: "Begin helemaal zelf, geen vaste opbouw.", blocks: () => [] },
+  text: {
+    label: "Tekstpagina",
+    description: "Titel + inleidende tekst — handig voor een eenvoudige informatiepagina.",
+    blocks: (title) => [
+      { id: tplId(), type: "heading", level: 1, text: title, align: "left" },
+      { id: tplId(), type: "text", html: "<p>Begin hier met schrijven…</p>", align: "left" },
+    ],
+  },
+  course: {
+    label: "Cursus-stijl",
+    description: "Titel, korte intro, tegels en een 'Veelgestelde vragen'-blok.",
+    blocks: (title) => [
+      { id: tplId(), type: "heading", level: 1, text: title, align: "left" },
+      { id: tplId(), type: "text", html: "<p>Korte introductietekst…</p>", align: "left" },
+      { id: tplId(), type: "tiles", items: [
+        { title: "Onderdeel 1", text: "Korte omschrijving.", link: null },
+        { title: "Onderdeel 2", text: "Korte omschrijving.", link: null },
+      ] },
+      { id: tplId(), type: "faq", items: [{ question: "Een veelgestelde vraag?", answer: "Het antwoord hierop." }] },
+    ],
+  },
+  contact: {
+    label: "Contact-stijl",
+    description: "Titel, tekst naast een contactformulier in twee kolommen.",
+    blocks: (title) => [
+      { id: tplId(), type: "heading", level: 1, text: title, align: "left" },
+      { id: tplId(), type: "columns", columns: 2, items: [
+        { blocks: [{ id: tplId(), type: "text", html: "<p>Contactgegevens of introductietekst…</p>", align: "left" }] },
+        { blocks: [{ id: tplId(), type: "contact-form", buttonText: "Versturen" }] },
+      ] },
+    ],
+  },
+};
+
+function chooseTemplate() {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+    overlay.innerHTML = `
+      <div class="modal-box" style="max-width:480px;">
+        <div class="modal-box__header">
+          <h2>Kies een opzet</h2>
+          <button type="button" class="btn-admin" data-close>Annuleren</button>
+        </div>
+        <div id="template-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    const close = (result) => { overlay.remove(); resolve(result); };
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) close(null); });
+    overlay.querySelector("[data-close]").addEventListener("click", () => close(null));
+
+    const list = overlay.querySelector("#template-list");
+    Object.entries(PAGE_TEMPLATES).forEach(([key, tpl]) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn-admin";
+      btn.style.cssText = "text-align:left;justify-content:flex-start;padding:14px;height:auto;flex-direction:column;align-items:flex-start;gap:2px;";
+      btn.innerHTML = `<strong>${tpl.label}</strong><span style="font-weight:400;font-size:var(--fs-xs);color:var(--color-ink-soft);">${tpl.description}</span>`;
+      btn.addEventListener("click", () => close(key));
+      list.appendChild(btn);
+    });
+  });
+}
+
 async function createNewPage() {
   const title = prompt("Titel van de nieuwe pagina:");
   if (!title || !title.trim()) return;
+  const templateKey = await chooseTemplate();
+  if (!templateKey) return;
   const admin = getCurrentAdmin();
   const baseSlug = slugify(title);
   const slug = await ensureUniqueSlug(baseSlug || "nieuwe-pagina");
@@ -143,7 +215,7 @@ async function createNewPage() {
       slug,
       status: "draft",
       trashed: false,
-      blocks: [],
+      blocks: PAGE_TEMPLATES[templateKey].blocks(title.trim()),
       seo: { title: "", description: "", ogImage: "" },
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
