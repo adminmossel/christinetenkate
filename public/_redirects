@@ -1,0 +1,23 @@
+# Cloudflare Pages routing
+#
+# Belangrijk: bij Cloudflare Pages worden regels in _redirects ALTIJD
+# toegepast, ook als het gevraagde bestand al bestaat. Daarom moeten we de
+# echte bestanden/mappen hieronder expliciet "doorlaten" (200 naar zichzelf)
+# vóórdat de laatste regel (/*) alles andere naar page.html stuurt.
+#
+# Elke URL die geen van de onderstaande paden is — dus elke door oma
+# aangemaakte pagina, zoals /over-mij of /contact — wordt afgehandeld door
+# page.html. page.html haalt op basis van de URL de juiste pagina op uit
+# Firestore.
+
+/                 /index.html    200
+/index.html       /index.html    200
+/404.html         /404.html      200
+/page.html        /page.html     200
+/favicon.ico      /favicon.ico   200
+/css/*            /css/:splat    200
+/js/*             /js/:splat     200
+/admin/*          /admin/:splat  200
+/media/*          /media/:splat  200
+
+/*                /page.html     200

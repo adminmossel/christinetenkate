@@ -224,6 +224,12 @@ function renderColumnsBlock(block, mediaMap) {
 
 function renderEmbedBlock(block) {
   const wrap = el("div", "block-embed");
+  // Alleen echte, veilige webadressen insluiten — nooit "javascript:" of
+  // andere niet-http(s)-schema's, ook niet als die ooit per ongeluk zijn
+  // opgeslagen.
+  let isSafe = false;
+  try { isSafe = ["https:", "http:"].includes(new URL(block.url).protocol); } catch { /* geen geldige URL */ }
+  if (!isSafe) return wrap;
   const iframe = el("iframe", null, {
     src: block.url,
     title: block.title || "Ingesloten inhoud",

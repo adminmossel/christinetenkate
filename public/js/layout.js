@@ -143,7 +143,17 @@ export async function initLayout() {
   applyColors(settings.colors);
   await renderHeader(settings);
   renderFooter(settings);
+  initHeaderScrollEffect();
   return settings;
+}
+
+/** Laat het dock groot beginnen en compact worden zodra er gescrold wordt. */
+function initHeaderScrollEffect() {
+  const header = document.getElementById("site-header");
+  if (!header) return;
+  const update = () => header.classList.toggle("is-scrolled", window.scrollY > 24);
+  update();
+  window.addEventListener("scroll", update, { passive: true });
 }
 
 /** Overschrijft de standaardkleuren uit tokens.css met de kleuren die oma in Instellingen heeft gekozen. */

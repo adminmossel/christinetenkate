@@ -9,8 +9,11 @@ let socialLinks = [];
 let logoUrl = "";
 let trustBadgeUrl = "";
 let trustBadgeAlt = "";
+let colorHistory = [];
+let currentSavedColors = null;
 
 const DEFAULT_COLORS = { primary: "#2F4A3E", accent: "#E2963F", bg: "#FBF9F4" };
+const MAX_COLOR_HISTORY = 8;
 
 async function boot() {
   const admin = await requireAdmin();
@@ -36,9 +39,12 @@ async function boot() {
   renderBadgePreview();
 
   const colors = { ...DEFAULT_COLORS, ...(data.colors || {}) };
+  currentSavedColors = colors;
+  colorHistory = data.colorHistory || [];
   document.getElementById("c-primary").value = colors.primary;
   document.getElementById("c-accent").value = colors.accent;
   document.getElementById("c-bg").value = colors.bg;
+  renderColorHistory();
   document.getElementById("reset-colors-btn").addEventListener("click", async () => {
     document.getElementById("c-primary").value = DEFAULT_COLORS.primary;
     document.getElementById("c-accent").value = DEFAULT_COLORS.accent;
@@ -73,6 +79,41 @@ function renderLogoPreview() {
 function renderBadgePreview() {
   const wrap = document.getElementById("badge-preview-wrap");
   wrap.innerHTML = trustBadgeUrl ? `<img src="${trustBadgeUrl}" style="height:70px;margin-bottom:8px;">` : `<p style="font-size:var(--fs-sm);color:var(--color-ink-soft);">Geen badge ingesteld.</p>`;
+}
+
+function renderColorHistory() {
+  const wrap = document.getElementById("color-history-list");
+  if (!wrap) return;
+  if (!colorHistory.length) {
+    wrap.innerHTML = `<p style="font-size:var(--fs-sm);color:var(--color-ink-soft);">Nog geen eerdere kleurencombinaties.</p>`;
+    return;
+  }
+  wrap.innerHTML = "";
+  [...colorHistory].reverse().forEach((entry) => {
+    const row = document.createElement("div");
+    row.style.cssText = "display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--color-line);";
+    const date = entry.savedAt?.toDate ? entry.savedAt.toDate().toLocaleString("nl-NL", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+    row.innerHTML = `
+      <span style="display:flex;gap:3px;">
+        <span style="width:18px;height:18px;border-radius:50%;background:${entry.primary};border:1px solid var(--color-line);"></span>
+        <span style="width:18px;height:18px;border-radius:50%;background:${entry.accent};border:1px solid var(--color-line);"></span>
+        <span style="width:18px;height:18px;border-radius:50%;background:${entry.bg};border:1px solid var(--color-line);"></span>
+      </span>
+      <span style="font-size:var(--fs-xs);color:var(--color-ink-soft);flex:1;">${date}</span>
+    `;
+    const restoreBtn = document.createElement("button");
+    restoreBtn.type = "button";
+    restoreBtn.className = "btn-admin";
+    restoreBtn.textContent = "Herstel";
+    restoreBtn.addEventListener("click", async () => {
+      document.getElementById("c-primary").value = entry.primary;
+      document.getElementById("c-accent").value = entry.accent;
+      document.getElementById("c-bg").value = entry.bg;
+      await save();
+    });
+    row.appendChild(restoreBtn);
+    wrap.appendChild(row);
+  });
 }
 
 function renderSocialLinks() {
@@ -113,6 +154,23 @@ async function save() {
     }
   }
   try {
+    const newColors = {
+      primary: document.getElementById("c-primary").value,
+      accent: document.getElementById("c-accent").value,
+      bg: document.getElementById("c-bg").value,
+    };
+    // De net verlaten kleurencombinatie bewaren in de geschiedenis, zodat
+    // je 'm later kunt terugzetten — maar alleen als er ook echt iets
+    // veranderd is (anders zou elke losse "Opslaan" een nieuw punt geven).
+    if (currentSavedColors && (
+      currentSavedColors.primary !== newColors.primary ||
+      currentSavedColors.accent !== newColors.accent ||
+      currentSavedColors.bg !== newColors.bg
+    )) {
+      colorHistory = [...colorHistory, { ...currentSavedColors, savedAt: new Date() }].slice(-MAX_COLOR_HISTORY);
+    }
+    currentSavedColors = newColors;
+
     await setDoc(doc(db, "settings", "site"), {
       siteName: document.getElementById("s-siteName").value.trim(),
       logoText: document.getElementById("s-logoText").value.trim(),
@@ -126,12 +184,10 @@ async function save() {
       trustBadgeUrl,
       trustBadgeAlt,
       socialLinks,
-      colors: {
-        primary: document.getElementById("c-primary").value,
-        accent: document.getElementById("c-accent").value,
-        bg: document.getElementById("c-bg").value,
-      },
+      colors: newColors,
+      colorHistory,
     });
+    renderColorHistory();
     showToast("Instellingen opgeslagen.");
   } catch (err) {
     console.error(err);

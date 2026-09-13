@@ -372,6 +372,20 @@ function normalizeEmbedUrl(url) {
   }
 }
 
+/**
+ * Staat alleen echte, veilige webadressen toe (https/http). Voorkomt dat
+ * iemand per ongeluk (of expres) een "javascript:"- of "data:"-adres in een
+ * embed-blok zet, wat een beveiligingsrisico zou zijn.
+ */
+function isSafeEmbedUrl(url) {
+  try {
+    const u = new URL(url);
+    return u.protocol === "https:" || u.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
 function editEmbed(block, patch) {
   const wrap = document.createElement("div");
   const preview = livePreview(() => ({ ...block }));
@@ -379,6 +393,15 @@ function editEmbed(block, patch) {
 
   const urlInput = textInput(block.url, (v) => {
     const normalized = normalizeEmbedUrl(v);
+    if (v.trim() && !isSafeEmbedUrl(normalized)) {
+      urlInput.style.borderColor = "var(--color-error)";
+      note.textContent = "Dit lijkt geen geldig, veilig webadres (moet met https:// of http:// beginnen) — niet opgeslagen.";
+      note.style.color = "var(--color-error)";
+      return;
+    }
+    urlInput.style.borderColor = "";
+    note.style.color = "var(--color-ink-soft)";
+    note.textContent = "Een gewone YouTube- of Vimeo-link wordt automatisch omgezet naar de juiste insluit-vorm.";
     patch({ url: normalized });
     if (normalized !== v) urlInput.value = normalized; // laat direct zien dat 'ie is omgezet
     preview.refresh();
