@@ -60,33 +60,52 @@
 /* ============ Site header ============ */
 .site-header {
   position: sticky;
-  top: var(--space-3);
+  top: 0;
   z-index: 100;
-  padding: 0 var(--space-3);
-  transition: top var(--transition);
+  padding: 0;
+  transition: top var(--transition), padding var(--transition);
 }
-.site-header.is-scrolled { top: 10px; }
+.site-header.is-scrolled { top: 12px; padding: 0 var(--space-3); }
 
 .site-header__island {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  max-width: 720px;
+  max-width: none;
   margin: 0 auto;
-  padding: 10px 10px 10px 22px;
-  background: color-mix(in srgb, var(--color-bg) 90%, transparent);
+  padding: 18px var(--space-4);
+  background: color-mix(in srgb, var(--color-bg) 94%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--color-line);
-  border-radius: 999px;
-  box-shadow: var(--shadow-md);
+  border: 1px solid transparent;
+  border-bottom: 1px solid var(--color-line);
+  border-radius: 0;
+  box-shadow: none;
   position: relative;
-  transition: padding var(--transition), box-shadow var(--transition), max-width var(--transition);
+  transition: padding var(--transition), box-shadow var(--transition), max-width var(--transition),
+              border-radius var(--transition), border-color var(--transition), background var(--transition);
 }
-/* Bij binnenkomst bovenaan de pagina staat het dock groter/ruimer; zodra je
-   scrollt, trekt hij zichzelf samen tot een compacte balk. */
-.site-header.is-scrolled .site-header__island { padding: 6px 6px 6px 18px; box-shadow: var(--shadow-lg); max-width: 640px; }
+.site-header__island::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-teal));
+  opacity: 0.8;
+  transition: opacity var(--transition);
+}
+.site-header.is-scrolled .site-header__island::after { opacity: 0; }
+/* Bovenaan de pagina: een strakke, volle balk (rechthoek). Zodra je
+   scrollt, trekt hij samen tot een los, afgerond dockje. */
+.site-header.is-scrolled .site-header__island {
+  max-width: 640px;
+  padding: 8px 8px 8px 20px;
+  border-radius: 999px;
+  border-color: var(--color-line);
+  box-shadow: var(--shadow-lg);
+  background: color-mix(in srgb, var(--color-bg) 90%, transparent);
+}
 .site-header.is-scrolled .site-logo__img { height: 32px; }
 .site-header:not(.is-scrolled) .site-header__island { padding-top: 16px; padding-bottom: 16px; }
 
@@ -177,6 +196,7 @@
   padding: 100px 14px 28px;
   display: flex;
   flex-direction: column;
+  flex-wrap: nowrap;
   background: var(--color-bg);
   height: 100%;
   width: 100%;
