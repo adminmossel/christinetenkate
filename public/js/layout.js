@@ -47,6 +47,7 @@ async function renderHeader(settings) {
           ? `<img src="${settings.logoUrl}" alt="${settings.siteName || "Christine ten Kate"}" class="site-logo__img">`
           : (settings.logoText || "Christine <span>ten Kate</span>")}
       </a>
+      <ul class="site-header__pinned" id="site-header-pinned"></ul>
       <div class="site-search" data-search-root></div>
       <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav-more" aria-label="Menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -77,6 +78,21 @@ async function renderHeader(settings) {
     const menuSnap = await getDoc(doc(db, "menu", "main"));
     const items = menuSnap.exists() ? (menuSnap.data().items || []) : [];
     const visible = items.filter((item) => !item.hidden);
+
+    // De maximaal 3 "vastgezette" items, rechtstreeks zichtbaar in de balk.
+    const pinnedEl = document.getElementById("site-header-pinned");
+    const pinnedItems = visible.filter((item) => item.pinned).slice(0, 3);
+    pinnedItems.forEach((item) => {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = item.type === "external" ? item.url : `/${(item.slug || "").replace(/^\//, "")}`;
+      if (item.type === "external") { a.target = "_blank"; a.rel = "noopener"; }
+      a.textContent = item.label;
+      const currentSlug = location.pathname.replace(/^\/|\/$/g, "") || "home";
+      if (item.slug && currentSlug === item.slug) a.setAttribute("aria-current", "page");
+      li.appendChild(a);
+      pinnedEl.appendChild(li);
+    });
 
     const moreEl = document.getElementById("main-nav-more");
     const ul = document.createElement("ul");

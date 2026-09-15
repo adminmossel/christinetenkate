@@ -22,7 +22,9 @@ async function boot() {
   document.getElementById("save-menu-btn").addEventListener("click", saveMenu);
 }
 
-function newItem() { return { label: "Nieuw item", type: "page", slug: "", url: "", hidden: false, children: [] }; }
+function newItem() { return { label: "Nieuw item", type: "page", slug: "", url: "", hidden: false, pinned: false, children: [] }; }
+
+function pinnedCount() { return items.filter((i) => i.pinned).length; }
 
 function pageOptions(selectedSlug) {
   return `<option value="">— Kies pagina —</option>` + pages.map((p) => `<option value="${p.slug}" ${p.slug === selectedSlug ? "selected" : ""}>${p.title}</option>`).join("");
@@ -53,6 +55,10 @@ function renderItem(item, index, parentArray, isChild = false) {
       <label style="display:flex;align-items:center;gap:4px;font-size:var(--fs-sm);">
         <input type="checkbox" class="menu-hidden" ${item.hidden ? "checked" : ""}> Verbergen
       </label>
+      ${!isChild ? `
+      <label style="display:flex;align-items:center;gap:4px;font-size:var(--fs-sm);" title="Toon dit item altijd direct in de balk bovenaan (max. 3)">
+        <input type="checkbox" class="menu-pinned" ${item.pinned ? "checked" : ""} ${!item.pinned && pinnedCount() >= 3 ? "disabled" : ""}> Vast in balk (max. 3)
+      </label>` : ""}
       ${!isChild ? `<button type="button" class="btn-admin" data-add-child">+ Submenu-item</button>` : ""}
       <button type="button" class="btn-admin btn-admin--danger" data-remove>Verwijderen</button>
     </div>
@@ -75,6 +81,10 @@ function renderItem(item, index, parentArray, isChild = false) {
   row.querySelector(".menu-label").addEventListener("input", (e) => { item.label = e.target.value; });
   row.querySelector(".menu-type").addEventListener("change", (e) => { item.type = e.target.value; renderTarget(); });
   row.querySelector(".menu-hidden").addEventListener("change", (e) => { item.hidden = e.target.checked; });
+  row.querySelector(".menu-pinned")?.addEventListener("change", (e) => {
+    item.pinned = e.target.checked;
+    render(); // her-render zodat overige vakjes op slot gaan als 3 bereikt is
+  });
   row.querySelector("[data-remove]").addEventListener("click", () => {
     parentArray.splice(index, 1);
     render();
