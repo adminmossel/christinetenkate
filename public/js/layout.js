@@ -42,12 +42,14 @@ async function renderHeader(settings) {
 
   header.innerHTML = `
     <div class="site-header__island">
-      <a class="site-logo" href="/">
-        ${settings.logoUrl
-          ? `<img src="${settings.logoUrl}" alt="${settings.siteName || "Christine ten Kate"}" class="site-logo__img">`
-          : (settings.logoText || "Christine <span>ten Kate</span>")}
-      </a>
-      <ul class="site-header__pinned" id="site-header-pinned"></ul>
+      <div class="site-header__start">
+        <a class="site-logo" href="/">
+          ${settings.logoUrl
+            ? `<img src="${settings.logoUrl}" alt="${settings.siteName || "Christine ten Kate"}" class="site-logo__img">`
+            : (settings.logoText || "Christine <span>ten Kate</span>")}
+        </a>
+        <ul class="site-header__pinned" id="site-header-pinned"></ul>
+      </div>
       <div class="site-search" data-search-root></div>
       <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav-more" aria-label="Menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
