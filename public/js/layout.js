@@ -7,6 +7,25 @@ import { db } from "./firebase-init.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { initSearch } from "./search.js";
 
+// Iconen per pagina in het uitklapmenu. Zoekt eerst naar een handmatig
+// ingesteld icoon op het menu-item zelf (`item.icon`, een van de keys
+// hieronder) zodat dit later ook per pagina instelbaar gemaakt kan worden
+// vanuit de admin — valt anders terug op de slug. Nu is alleen "contact"
+// ingevuld met een zelfgemaakt icoontje (pratend belletje + hartje).
+const MENU_ICONS = {
+  contact: `
+    <path d="M4 6.2A2.2 2.2 0 0 1 6.2 4h11.6A2.2 2.2 0 0 1 20 6.2v6.6a2.2 2.2 0 0 1-2.2 2.2H10l-4.6 3.7v-3.7h-1A2.2 2.2 0 0 1 2 12.8"/>
+    <path d="M9 8.7c1-1.3 2.9-.7 2.9.8 0 1.1-1 1.9-2.9 3.4-1.9-1.5-2.9-2.3-2.9-3.4 0-1.5 1.9-2.1 2.9-.8Z" fill="currentColor" stroke="none"/>
+  `,
+};
+
+function menuIcon(item) {
+  const key = item.icon || item.slug;
+  const path = MENU_ICONS[key];
+  if (!path) return "";
+  return `<svg class="main-nav__item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+}
+
 function buildMenuItem(item, index = 0) {
   const li = document.createElement("li");
   li.className = "main-nav__item";
@@ -22,6 +41,7 @@ function buildMenuItem(item, index = 0) {
     a.setAttribute("aria-current", "page");
   }
   a.innerHTML = `
+    ${menuIcon(item)}
     <span class="main-nav__item-label">${item.label}</span>
     <svg class="main-nav__item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
   `;
@@ -56,11 +76,22 @@ async function renderHeader(settings) {
         <span>Menu</span>
       </button>
     </div>
-    <div class="main-nav__more" id="main-nav-more"></div>
+    <div class="main-nav__more" id="main-nav-more">
+      <div class="main-nav__panel">
+        <div class="main-nav__panel-head">
+          <span class="main-nav__panel-title">${settings.logoText ? settings.logoText.replace(/<[^>]*>/g, "") : "Menu"}</span>
+          <button type="button" class="main-nav__close" aria-label="Menu sluiten">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+          </button>
+        </div>
+        <div class="main-nav__panel-body" id="main-nav-more-body"></div>
+      </div>
+    </div>
   `;
 
   const toggle = header.querySelector(".nav-toggle");
   const more = header.querySelector("#main-nav-more");
+  const closeBtn = header.querySelector(".main-nav__close");
   function closeMenu() {
     more.classList.remove("is-open");
     toggle.setAttribute("aria-expanded", "false");
@@ -71,6 +102,7 @@ async function renderHeader(settings) {
     toggle.setAttribute("aria-expanded", String(isOpen));
     toggle.classList.toggle("is-open", isOpen);
   });
+  closeBtn.addEventListener("click", closeMenu);
   // Klikken op de donkere achtergrond zelf (niet op het menupaneel erin)
   // sluit het uitklapmenu.
   more.addEventListener("click", (e) => { if (e.target === more) closeMenu(); });
@@ -96,7 +128,7 @@ async function renderHeader(settings) {
       pinnedEl.appendChild(li);
     });
 
-    const moreEl = document.getElementById("main-nav-more");
+    const moreEl = document.getElementById("main-nav-more-body");
     const ul = document.createElement("ul");
     ul.className = "main-nav__list main-nav__list--more";
     let i = 0;

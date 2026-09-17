@@ -10,6 +10,18 @@ import { collection, query, where, getDocs } from "https://www.gstatic.com/fireb
 
 let indexPromise = null;
 
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+/** Zet de gevonden zoekterm onderstreept in de tekst, voor overzicht in de resultatenlijst. */
+function highlightTerm(text, term) {
+  const escaped = escapeHtml(text);
+  if (!term) return escaped;
+  const escTerm = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return escaped.replace(new RegExp(`(${escTerm})`, "gi"), "<u>$1</u>");
+}
+
 /** Haalt alle platte tekst uit een blokken-array, incl. geneste kolommen. */
 function extractText(blocks) {
   const parts = [];
@@ -93,11 +105,11 @@ export function initSearch(root) {
       results.innerHTML = matches.length
         ? matches.map((p) => `
             <a href="/${p.slug}">
-              <span class="site-search__result-title">${p.title}</span>
-              ${p.context ? `<span class="site-search__result-context">${p.context}</span>` : ""}
+              <span class="site-search__result-title">${escapeHtml(p.title)}</span>
+              ${p.context ? `<span class="site-search__result-context">${highlightTerm(p.context, term)}</span>` : ""}
             </a>
           `).join("")
-        : `<p style="padding:0.8rem;">Geen resultaten gevonden.</p>`;
+        : `<p class="site-search__empty">Geen resultaten gevonden.</p>`;
       results.hidden = false;
     }, 200);
   });
