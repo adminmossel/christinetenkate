@@ -92,6 +92,7 @@ function renderStickyContactLinkBtn() {
     if (link !== undefined) { stickyContactLink = link; btn.textContent = label(); }
   });
   wrap.appendChild(btn);
+}
 
 function renderLogoPreview() {
   const wrap = document.getElementById("logo-preview-wrap");
