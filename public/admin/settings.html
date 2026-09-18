@@ -82,6 +82,19 @@
       <div id="social-links-list"></div>
       <button class="btn-admin" id="add-social-btn">+ Link toevoegen</button>
     </div>
+
+    <div class="admin-card">
+      <h3>Meeschuivende contactknop</h3>
+      <p style="font-size:var(--fs-sm);color:var(--color-ink-soft);">Een knop die blijft meescrollen, zodat bezoekers altijd makkelijk contact kunnen opnemen.</p>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <input type="checkbox" id="sc-enabled"> Toon deze knop op de website
+      </label>
+      <div class="admin-field"><label>Knoptekst</label><input type="text" id="sc-text" placeholder="Neem contact op"></div>
+      <div class="admin-field">
+        <label>Waar moet de knop naartoe linken?</label>
+        <div id="sc-link-wrap"></div>
+      </div>
+    </div>
   </div>
   <script type="module" src="/admin/js/settings.js"></script>
 </body>

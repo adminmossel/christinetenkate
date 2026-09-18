@@ -334,6 +334,42 @@ function renderTilesBlock(block, mediaMap) {
   return grid;
 }
 
+function renderReviewsBlock(block) {
+  const wrap = el("div", "block-reviews");
+  if (block.title) {
+    const h = document.createElement("h2");
+    h.className = "block-reviews__title";
+    h.textContent = block.title;
+    wrap.appendChild(h);
+  }
+  const grid = el("div", "review-grid");
+  (block.items || []).forEach((item) => {
+    const card = el("figure", "review-card");
+    const rating = Math.min(5, Math.max(1, item.rating || 5));
+    const stars = el("div", "review-card__stars", { "aria-hidden": "true" });
+    stars.textContent = "★".repeat(rating) + "☆".repeat(5 - rating);
+    card.appendChild(stars);
+    const quote = document.createElement("blockquote");
+    quote.textContent = item.text || "";
+    card.appendChild(quote);
+    if (item.name) {
+      const cap = document.createElement("figcaption");
+      const strong = document.createElement("strong");
+      strong.textContent = item.name;
+      cap.appendChild(strong);
+      if (item.role) {
+        const span = document.createElement("span");
+        span.textContent = ` — ${item.role}`;
+        cap.appendChild(span);
+      }
+      card.appendChild(cap);
+    }
+    grid.appendChild(card);
+  });
+  wrap.appendChild(grid);
+  return wrap;
+}
+
 const RENDERERS = {
   hero: renderHeroBlock,
   tiles: renderTilesBlock,
@@ -350,6 +386,7 @@ const RENDERERS = {
   columns: renderColumnsBlock,
   embed: renderEmbedBlock,
   faq: renderFaqBlock,
+  reviews: renderReviewsBlock,
 };
 
 /**

@@ -3,6 +3,7 @@ import { requireAdmin } from "./admin-auth.js";
 import { renderAdminShell, showToast } from "./admin-shell.js";
 import { db } from "../../js/firebase-init.js";
 import { doc, getDoc, setDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { MENU_ICON_LIBRARY, menuIconSvg } from "../../js/menu-icons.js";
 
 let items = [];
 let pages = [];
@@ -30,6 +31,17 @@ function pageOptions(selectedSlug) {
   return `<option value="">— Kies pagina —</option>` + pages.map((p) => `<option value="${p.slug}" ${p.slug === selectedSlug ? "selected" : ""}>${p.title}</option>`).join("");
 }
 
+function iconOptions(selected) {
+  const items = Object.entries(MENU_ICON_LIBRARY)
+    .map(([key, def]) => `<option value="${key}" ${selected === key ? "selected" : ""}>${def.label}</option>`)
+    .join("");
+  return `
+    <option value="">Icoon: automatisch</option>
+    <option value="none" ${selected === "none" ? "selected" : ""}>Icoon: geen</option>
+    ${items}
+  `;
+}
+
 function render() {
   const list = document.getElementById("menu-list");
   list.innerHTML = "";
@@ -52,6 +64,8 @@ function renderItem(item, index, parentArray, isChild = false) {
         <option value="external" ${item.type === "external" ? "selected" : ""}>Externe link</option>
       </select>
       <span class="menu-target-slot"></span>
+      <span class="menu-icon-preview" title="Icoon bij dit menu-item"></span>
+      <select class="menu-icon" style="padding:6px;">${iconOptions(item.icon)}</select>
       <label style="display:flex;align-items:center;gap:4px;font-size:var(--fs-sm);">
         <input type="checkbox" class="menu-hidden" ${item.hidden ? "checked" : ""}> Verbergen
       </label>
@@ -71,12 +85,23 @@ function renderItem(item, index, parentArray, isChild = false) {
       ? `<select class="menu-target-page" style="padding:6px;">${pageOptions(item.slug)}</select>`
       : `<input type="text" class="menu-target-url" placeholder="https://…" value="${item.url || ""}" style="padding:6px;border:1px solid var(--color-line);border-radius:4px;">`;
     if (item.type === "page") {
-      targetSlot.querySelector(".menu-target-page").addEventListener("change", (e) => { item.slug = e.target.value; });
+      targetSlot.querySelector(".menu-target-page").addEventListener("change", (e) => { item.slug = e.target.value; renderIconPreview(); });
     } else {
       targetSlot.querySelector(".menu-target-url").addEventListener("input", (e) => { item.url = e.target.value; });
     }
   }
   renderTarget();
+
+  const iconPreview = row.querySelector(".menu-icon-preview");
+  function renderIconPreview() {
+    const key = item.icon === "none" ? null : (item.icon || item.slug);
+    iconPreview.innerHTML = key ? menuIconSvg(key, "menu-icon-preview__svg") : "";
+  }
+  renderIconPreview();
+  row.querySelector(".menu-icon").addEventListener("change", (e) => {
+    item.icon = e.target.value || undefined;
+    renderIconPreview();
+  });
 
   row.querySelector(".menu-label").addEventListener("input", (e) => { item.label = e.target.value; });
   row.querySelector(".menu-type").addEventListener("change", (e) => { item.type = e.target.value; renderTarget(); });

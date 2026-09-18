@@ -6,6 +6,7 @@ import { BLOCK_LIBRARY, HOME_ONLY_BLOCKS, buildBlockEditorUI } from "./editor-bl
 import { db } from "../../js/firebase-init.js";
 import { renderBlocks, collectMediaIds } from "../../js/render.js";
 import { fetchMediaMap } from "./media-picker.js";
+import { openMediaPicker } from "./media-picker.js";
 import {
   doc, getDoc, updateDoc, collection, addDoc, getDocs, query, orderBy, limit,
   serverTimestamp, deleteDoc,
@@ -15,7 +16,7 @@ import {
 const BLOCK_ICONS = {
   text: "✎", heading: "𝐇", quote: "❝",
   image: "🖼", gallery: "▦", file: "📎", embed: "▶",
-  button: "⬭", "contact-form": "✉", faq: "❓",
+  button: "⬭", "contact-form": "✉", faq: "❓", reviews: "☆",
   columns: "▥", divider: "―", spacer: "␣",
   hero: "★", tiles: "▦",
 };
@@ -40,6 +41,7 @@ async function boot() {
   pageData = { id: snap.id, ...snap.data() };
   pageData.blocks = pageData.blocks || [];
   pageData.seo = pageData.seo || { title: "", description: "", ogImage: "" };
+  pageData.showBackToTop = pageData.showBackToTop !== false;
 
   renderShell(main);
   window.addEventListener("beforeunload", (e) => {
@@ -102,6 +104,20 @@ function renderShell(main) {
             <label>Meta-omschrijving</label>
             <textarea id="seo-description" rows="3">${pageData.seo.description || ""}</textarea>
           </div>
+          <div class="admin-field">
+            <label>Deelafbeelding (Open Graph) — de afbeelding die verschijnt als deze pagina gedeeld wordt via WhatsApp, Facebook, LinkedIn e.d.</label>
+            <div id="og-image-preview"></div>
+            <div style="display:flex;gap:8px;">
+              <button type="button" class="btn-admin" id="pick-og-image-btn">Afbeelding kiezen / wijzigen</button>
+              <button type="button" class="btn-admin btn-admin--danger" id="remove-og-image-btn">Verwijderen</button>
+            </div>
+          </div>
+        `)}
+        ${collapsiblePanel("display-panel", "Weergave", true, `
+          <label style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" id="show-back-to-top" ${pageData.showBackToTop ? "checked" : ""}>
+            "Terug naar boven"-knop tonen op deze pagina
+          </label>
         `)}
         ${collapsiblePanel("versions-panel", "Versiegeschiedenis", true, `
           <div id="version-list"><p style="font-size:var(--fs-sm);color:var(--color-ink-soft);">Wordt geladen…</p></div>
@@ -127,6 +143,17 @@ function renderShell(main) {
   document.getElementById("page-slug-input").addEventListener("change", onSlugChange);
   document.getElementById("seo-title").addEventListener("input", (e) => { pageData.seo.title = e.target.value; markDirty(); });
   document.getElementById("seo-description").addEventListener("input", (e) => { pageData.seo.description = e.target.value; markDirty(); });
+  renderOgImagePreview();
+  document.getElementById("pick-og-image-btn").addEventListener("click", async () => {
+    const media = await openMediaPicker({ accept: "image" });
+    if (media) { pageData.seo.ogImage = media.url; renderOgImagePreview(); markDirty(); }
+  });
+  document.getElementById("remove-og-image-btn").addEventListener("click", () => {
+    pageData.seo.ogImage = "";
+    renderOgImagePreview();
+    markDirty();
+  });
+  document.getElementById("show-back-to-top").addEventListener("change", (e) => { pageData.showBackToTop = e.target.checked; markDirty(); });
   document.getElementById("save-draft-btn").addEventListener("click", () => saveNow(false));
   document.getElementById("publish-btn").addEventListener("click", onPublish);
   document.getElementById("save-version-btn").addEventListener("click", () => saveVersion(true));
@@ -146,6 +173,16 @@ function renderShell(main) {
 
 function escapeAttr(str) {
   return (str || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+}
+
+function renderOgImagePreview() {
+  const wrap = document.getElementById("og-image-preview");
+  const removeBtn = document.getElementById("remove-og-image-btn");
+  if (!wrap) return;
+  wrap.innerHTML = pageData.seo.ogImage
+    ? `<img src="${pageData.seo.ogImage}" style="max-height:90px;border-radius:8px;margin-bottom:8px;display:block;">`
+    : `<p style="font-size:var(--fs-sm);color:var(--color-ink-soft);">Nog geen deelafbeelding gekozen — sociale media tonen dan hun eigen standaardvoorbeeld.</p>`;
+  if (removeBtn) removeBtn.style.display = pageData.seo.ogImage ? "" : "none";
 }
 
 /** Bouwt een uitklapbaar paneel (bijv. SEO, Versiegeschiedenis) met een pijltje. */
@@ -193,6 +230,7 @@ async function saveNow(isPublishAction) {
       slug: pageData.slug,
       blocks: pageData.blocks,
       seo: pageData.seo,
+      showBackToTop: pageData.showBackToTop,
       status: pageData.status,
       updatedAt: serverTimestamp(),
       updatedBy: admin?.email || null,

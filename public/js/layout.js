@@ -6,24 +6,18 @@
 import { db } from "./firebase-init.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { initSearch } from "./search.js";
+import { resolveLink } from "./render.js";
+import { menuIconSvg } from "./menu-icons.js";
 
-// Iconen per pagina in het uitklapmenu. Zoekt eerst naar een handmatig
-// ingesteld icoon op het menu-item zelf (`item.icon`, een van de keys
-// hieronder) zodat dit later ook per pagina instelbaar gemaakt kan worden
-// vanuit de admin — valt anders terug op de slug. Nu is alleen "contact"
-// ingevuld met een zelfgemaakt icoontje (pratend belletje + hartje).
-const MENU_ICONS = {
-  contact: `
-    <path d="M4 6.2A2.2 2.2 0 0 1 6.2 4h11.6A2.2 2.2 0 0 1 20 6.2v6.6a2.2 2.2 0 0 1-2.2 2.2H10l-4.6 3.7v-3.7h-1A2.2 2.2 0 0 1 2 12.8"/>
-    <path d="M9 8.7c1-1.3 2.9-.7 2.9.8 0 1.1-1 1.9-2.9 3.4-1.9-1.5-2.9-2.3-2.9-3.4 0-1.5 1.9-2.1 2.9-.8Z" fill="currentColor" stroke="none"/>
-  `,
-};
-
+// Zoekt eerst naar een handmatig gekozen icoon op het menu-item zelf
+// (`item.icon`, in te stellen bij Menu in de admin), en valt anders terug
+// op de paginaslug — zo staat er standaard al een icoontje bij "Contact",
+// zonder dat daar iets voor ingesteld hoeft te worden. Kiest oma expliciet
+// "Geen icoon" in de admin, dan staat `item.icon` op "none" en wordt er
+// niets getoond (ook niet de standaard op basis van de slug).
 function menuIcon(item) {
-  const key = item.icon || item.slug;
-  const path = MENU_ICONS[key];
-  if (!path) return "";
-  return `<svg class="main-nav__item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+  const key = item.icon === "none" ? null : (item.icon || item.slug);
+  return key ? menuIconSvg(key, "main-nav__item-icon") : "";
 }
 
 function buildMenuItem(item, index = 0) {
@@ -182,6 +176,23 @@ function renderFooter(settings) {
   `;
 }
 
+/** Bouwt (of verwijdert) de meeschuivende contactknop, op basis van de instelling bij Instellingen. */
+function renderStickyContact(settings) {
+  document.getElementById("sticky-contact")?.remove();
+  const sc = settings.stickyContact;
+  if (!sc || !sc.enabled || !sc.link || !sc.link.value) return;
+  const a = document.createElement("a");
+  a.id = "sticky-contact";
+  a.className = "sticky-contact";
+  a.href = resolveLink(sc.link);
+  if (sc.link.newTab) { a.target = "_blank"; a.rel = "noopener"; }
+  a.innerHTML = `
+    ${menuIconSvg("contact")}
+    <span>${sc.text || "Neem contact op"}</span>
+  `;
+  document.body.appendChild(a);
+}
+
 export async function initLayout() {
   let settings = {};
   try {
@@ -193,6 +204,7 @@ export async function initLayout() {
   applyColors(settings.colors);
   await renderHeader(settings);
   renderFooter(settings);
+  renderStickyContact(settings);
   initHeaderScrollEffect();
   return settings;
 }

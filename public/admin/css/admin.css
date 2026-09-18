@@ -517,3 +517,6 @@ table.admin-table { width: 100%; border-collapse: collapse; }
 .daily-chart__col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 6px; }
 .daily-chart__bar { width: 100%; max-width: 26px; background: var(--color-primary); border-radius: 4px 4px 0 0; transition: height 400ms ease; min-height: 3px; }
 .daily-chart__label { font-size: 10px; color: var(--color-ink-soft); white-space: nowrap; }
+
+.menu-icon-preview { display: inline-flex; align-items: center; justify-content: center; width: 22px; }
+.menu-icon-preview__svg { width: 18px; height: 18px; color: var(--color-accent); }

@@ -24,6 +24,7 @@ export const BLOCK_LIBRARY = {
   button: { label: "Knop", group: "Interactie", factory: () => ({ id: newId(), type: "button", text: "Klik hier", link: null, align: "left", style: "solid" }) },
   "contact-form": { label: "Contactformulier", group: "Interactie", factory: () => ({ id: newId(), type: "contact-form", buttonText: "Versturen" }) },
   faq: { label: "Vraag & antwoord (FAQ)", group: "Interactie", factory: () => ({ id: newId(), type: "faq", items: [{ question: "Een veelgestelde vraag?", answer: "Het antwoord hierop." }] }) },
+  reviews: { label: "Reviews / ervaringen", group: "Vertrouwen", factory: () => ({ id: newId(), type: "reviews", title: "Wat anderen zeggen", items: [{ name: "Naam", role: "", text: "Een mooie ervaring…", rating: 5 }] }) },
   columns: { label: "Kolommen", group: "Layout", factory: () => ({ id: newId(), type: "columns", columns: 2, items: [{ blocks: [] }, { blocks: [] }] }) },
   divider: { label: "Scheidingslijn", group: "Layout", factory: () => ({ id: newId(), type: "divider" }) },
   spacer: { label: "Ruimte", group: "Layout", factory: () => ({ id: newId(), type: "spacer", height: 40 }) },
@@ -95,7 +96,7 @@ function linkButton(currentLink, onSet) {
  * media-object (met `.id`) — de aanroeper slaat daarvan alleen `.id` op
  * (als `mediaId`), nooit de foto-data zelf.
  */
-function imagePreviewAndPicker(mediaId, onPick) {
+export function imagePreviewAndPicker(mediaId, onPick) {
   const wrap = document.createElement("div");
   const trigger = document.createElement("div");
   trigger.className = "media-picker-trigger";
@@ -599,6 +600,52 @@ function editTiles(block, patch) {
   return wrap;
 }
 
+function editReviews(block, patch) {
+  const wrap = document.createElement("div");
+  const preview = livePreview(() => ({ ...block, items: (block.items || []).map((i) => ({ ...i })) }));
+  wrap.appendChild(preview.el);
+
+  wrap.appendChild(field("Titel boven het blok (optioneel)", textInput(block.title, (v) => { patch({ title: v }); preview.refresh(); })));
+
+  const list = document.createElement("div");
+  function renderList() {
+    list.innerHTML = "";
+    (block.items || []).forEach((item, idx) => {
+      const row = document.createElement("div");
+      row.className = "column-editor";
+      row.style.marginBottom = "8px";
+      row.appendChild(field("Naam", textInput(item.name, (v) => { item.name = v; patch({ items: block.items }); preview.refresh(); })));
+      row.appendChild(field("Functie / organisatie (optioneel)", textInput(item.role, (v) => { item.role = v; patch({ items: block.items }); preview.refresh(); }, "bijv. pedagogisch medewerker, kinderdagverblijf De Beestenboel")));
+      const text = document.createElement("textarea");
+      text.rows = 3; text.value = item.text || "";
+      text.addEventListener("input", () => { item.text = text.value; patch({ items: block.items }); preview.refresh(); });
+      row.appendChild(field("Review-tekst", text));
+      row.appendChild(field("Aantal sterren", selectInput(String(item.rating || 5), [5, 4, 3, 2, 1].map((n) => ({ value: String(n), label: `${n} — ${"★".repeat(n)}${"☆".repeat(5 - n)}` })), (v) => { item.rating = Number(v); patch({ items: block.items }); preview.refresh(); })));
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button"; removeBtn.className = "btn-admin btn-admin--danger";
+      removeBtn.textContent = "Review verwijderen"; removeBtn.style.marginTop = "6px";
+      removeBtn.addEventListener("click", () => { block.items.splice(idx, 1); patch({ items: block.items }); renderList(); preview.refresh(); });
+      row.appendChild(removeBtn);
+      list.appendChild(row);
+    });
+  }
+  renderList();
+
+  const addBtn = document.createElement("button");
+  addBtn.type = "button"; addBtn.className = "btn-admin"; addBtn.textContent = "+ Review toevoegen";
+  addBtn.addEventListener("click", () => {
+    block.items = block.items || [];
+    block.items.push({ name: "Naam", role: "", text: "Een mooie ervaring…", rating: 5 });
+    patch({ items: block.items });
+    renderList();
+    preview.refresh();
+  });
+
+  wrap.appendChild(list);
+  wrap.appendChild(addBtn);
+  return wrap;
+}
+
 const EDITORS = {
   text: editText,
   heading: editHeading,
@@ -610,6 +657,7 @@ const EDITORS = {
   button: editButton,
   "contact-form": editContactForm,
   faq: editFaq,
+  reviews: editReviews,
   columns: editColumns,
   divider: () => { const p = document.createElement("p"); p.style.color = "var(--color-ink-soft)"; p.style.fontSize = "var(--fs-sm)"; p.textContent = "Een dunne scheidingslijn — geen instellingen nodig."; return p; },
   spacer: editSpacer,

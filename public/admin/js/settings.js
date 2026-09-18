@@ -2,6 +2,7 @@
 import { requireAdmin } from "./admin-auth.js";
 import { renderAdminShell, showToast } from "./admin-shell.js";
 import { openMediaPicker } from "./media-picker.js";
+import { openLinkPicker } from "./link-picker.js";
 import { db } from "../../js/firebase-init.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -11,6 +12,7 @@ let trustBadgeUrl = "";
 let trustBadgeAlt = "";
 let colorHistory = [];
 let currentSavedColors = null;
+let stickyContactLink = null;
 
 const DEFAULT_COLORS = { primary: "#2F4A3E", accent: "#E2963F", bg: "#FBF9F4" };
 const MAX_COLOR_HISTORY = 8;
@@ -69,7 +71,27 @@ async function boot() {
     renderSocialLinks();
   });
   document.getElementById("save-settings-btn").addEventListener("click", save);
+
+  const stickyContact = data.stickyContact || { enabled: false, text: "Neem contact op", link: null };
+  document.getElementById("sc-enabled").checked = !!stickyContact.enabled;
+  document.getElementById("sc-text").value = stickyContact.text || "Neem contact op";
+  stickyContactLink = stickyContact.link || null;
+  renderStickyContactLinkBtn();
 }
+
+function renderStickyContactLinkBtn() {
+  const wrap = document.getElementById("sc-link-wrap");
+  wrap.innerHTML = "";
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "btn-admin";
+  const label = () => (!stickyContactLink || !stickyContactLink.value ? "Link instellen" : `Link: ${stickyContactLink.value}`);
+  btn.textContent = label();
+  btn.addEventListener("click", async () => {
+    const link = await openLinkPicker(stickyContactLink);
+    if (link !== undefined) { stickyContactLink = link; btn.textContent = label(); }
+  });
+  wrap.appendChild(btn);
 
 function renderLogoPreview() {
   const wrap = document.getElementById("logo-preview-wrap");
@@ -186,6 +208,11 @@ async function save() {
       socialLinks,
       colors: newColors,
       colorHistory,
+      stickyContact: {
+        enabled: document.getElementById("sc-enabled").checked,
+        text: document.getElementById("sc-text").value.trim() || "Neem contact op",
+        link: stickyContactLink,
+      },
     });
     renderColorHistory();
     showToast("Instellingen opgeslagen.");
