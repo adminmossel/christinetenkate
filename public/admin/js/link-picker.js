@@ -6,6 +6,7 @@
 import { db } from "../../js/firebase-init.js";
 import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { openMediaPicker, fetchMediaMap } from "./media-picker.js";
+import { normalizeExternalUrl } from "../../js/render.js";
 
 const TYPE_LABELS = {
   page: "Pagina op de website",
@@ -133,6 +134,7 @@ export function openLinkPicker(initialLink = null) {
         value = targetField.querySelector("#link-value-input").value.trim();
       }
       if (!value) { alert("Vul een geldige bestemming in."); return; }
+      if (type === "external") value = normalizeExternalUrl(value);
       close({ type, value, newTab: newTabCheckbox.checked });
     });
   });

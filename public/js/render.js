@@ -29,6 +29,19 @@ function el(tag, className, attrs = {}) {
   return node;
 }
 
+// Iemand die een externe link intypt, vergeet weleens "https://" ervoor
+// te zetten (bijv. "instagram.com/christinetenkate" i.p.v.
+// "https://instagram.com/christinetenkate"). Zonder schema behandelt de
+// browser zo'n waarde als een relatief pad ÓP deze site — de link "blijft
+// in de website" hangen in plaats van ernaartoe te gaan. Deze functie zet
+// er alsnog "https://" voor als dat nog ontbreekt.
+export function normalizeExternalUrl(value) {
+  const v = (value || "").trim();
+  if (!v) return v;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(v) || v.startsWith("//")) return v; // heeft al een schema (https:, mailto:, //...)
+  return `https://${v}`;
+}
+
 // Links van het type "file" verwijzen naar een mediaId, niet naar een kant-
 // en-klare URL — die moet dus altijd via mediaMap opgezocht worden. Alle
 // andere linktypes zijn wel direct om te zetten naar een href.
@@ -40,7 +53,7 @@ function resolveLink(link) {
     case "phone": return `tel:${link.value.replace(/\s+/g, "")}`;
     case "anchor": return `#${link.value.replace(/^#/, "")}`;
     case "file": return `media:${link.value}`; // wordt hieronder altijd nog vertaald
-    case "external":
+    case "external": return normalizeExternalUrl(link.value);
     default: return link.value;
   }
 }

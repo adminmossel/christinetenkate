@@ -6,7 +6,7 @@
 import { db } from "./firebase-init.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { initSearch } from "./search.js";
-import { resolveLink } from "./render.js";
+import { resolveLink, normalizeExternalUrl } from "./render.js";
 import { menuIconSvg } from "./menu-icons.js";
 
 // Zoekt eerst naar een handmatig gekozen icoon op het menu-item zelf
@@ -25,7 +25,7 @@ function buildMenuItem(item, index = 0) {
   li.className = "main-nav__item";
   li.style.setProperty("--stagger", index);
   const a = document.createElement("a");
-  a.href = item.type === "external" ? item.url : `/${(item.slug || "").replace(/^\//, "")}`;
+  a.href = item.type === "external" ? normalizeExternalUrl(item.url) : `/${(item.slug || "").replace(/^\//, "")}`;
   if (item.type === "external") {
     a.target = "_blank";
     a.rel = "noopener";
@@ -113,7 +113,7 @@ async function renderHeader(settings) {
     pinnedItems.forEach((item) => {
       const li = document.createElement("li");
       const a = document.createElement("a");
-      a.href = item.type === "external" ? item.url : `/${(item.slug || "").replace(/^\//, "")}`;
+      a.href = item.type === "external" ? normalizeExternalUrl(item.url) : `/${(item.slug || "").replace(/^\//, "")}`;
       if (item.type === "external") { a.target = "_blank"; a.rel = "noopener"; }
       a.textContent = item.label;
       const currentSlug = location.pathname.replace(/^\/|\/$/g, "") || "home";

@@ -4,6 +4,7 @@ import { renderAdminShell, showToast } from "./admin-shell.js";
 import { db } from "../../js/firebase-init.js";
 import { doc, getDoc, setDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { MENU_ICON_LIBRARY, menuIconSvg } from "../../js/menu-icons.js";
+import { normalizeExternalUrl } from "../../js/render.js";
 
 let items = [];
 let pages = [];
@@ -88,6 +89,10 @@ function renderItem(item, index, parentArray, isChild = false) {
       targetSlot.querySelector(".menu-target-page").addEventListener("change", (e) => { item.slug = e.target.value; renderIconPreview(); });
     } else {
       targetSlot.querySelector(".menu-target-url").addEventListener("input", (e) => { item.url = e.target.value; });
+      targetSlot.querySelector(".menu-target-url").addEventListener("blur", (e) => {
+        item.url = normalizeExternalUrl(e.target.value);
+        e.target.value = item.url;
+      });
     }
   }
   renderTarget();
@@ -137,8 +142,16 @@ function renderItem(item, index, parentArray, isChild = false) {
   return row;
 }
 
+function fixExternalUrls(list) {
+  (list || []).forEach((item) => {
+    if (item.type === "external" && item.url) item.url = normalizeExternalUrl(item.url);
+    if (item.children?.length) fixExternalUrls(item.children);
+  });
+}
+
 async function saveMenu() {
   try {
+    fixExternalUrls(items);
     await setDoc(doc(db, "menu", "main"), { items });
     showToast("Menu opgeslagen.");
   } catch (err) {
