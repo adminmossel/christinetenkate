@@ -15,7 +15,7 @@ export function slugify(text) {
     .replace(/^-|-$/g, "");
 }
 
-import { db } from "../../js/firebase-init.js";
+import { db } from "../../public/js/firebase-init.js";
 import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 /**

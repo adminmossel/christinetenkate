@@ -2,8 +2,9 @@
 import { requireAdmin } from "./admin-auth.js";
 import { renderAdminShell, showToast } from "./admin-shell.js";
 import { uploadFile } from "./media-picker.js";
-import { db } from "../../js/firebase-init.js";
+import { db, storage } from "../../public/js/firebase-init.js";
 import { collection, getDocs, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { ref, deleteObject } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 let allMedia = [];
 
@@ -75,9 +76,8 @@ function openDetail(media) {
         <input type="text" id="detail-alt" value="${media.alt || ""}">
       </div>` : ""}
       <div class="admin-field">
-        <label>Bestandsgrootte</label>
-        <input type="text" readonly value="${((media.size || 0) / 1024).toFixed(0)} KB">
-        <small>Dit bestand staat rechtstreeks in de database opgeslagen (geen los te delen webadres) — gebruik het via de pagina-editor.</small>
+        <label>Directe link</label>
+        <input type="text" readonly value="${media.url}" onclick="this.select()">
       </div>
       <div style="display:flex;justify-content:space-between;">
         <button type="button" class="btn-admin btn-admin--danger" data-delete>Verwijderen</button>
@@ -106,6 +106,7 @@ function openDetail(media) {
   overlay.querySelector("[data-delete]").addEventListener("click", async () => {
     if (!confirm(`"${media.name}" verwijderen? Let op: als dit bestand nog op een pagina gebruikt wordt, verdwijnt het daar ook.`)) return;
     try {
+      await deleteObject(ref(storage, media.path));
       await deleteDoc(doc(db, "media", media.id));
       showToast("Bestand verwijderd.");
       overlay.remove();

@@ -1,7 +1,7 @@
 // menu-editor.js
 import { requireAdmin } from "./admin-auth.js";
 import { renderAdminShell, showToast } from "./admin-shell.js";
-import { db } from "../../js/firebase-init.js";
+import { db } from "../../public/js/firebase-init.js";
 import { doc, getDoc, setDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 let items = [];

@@ -1,7 +1,7 @@
 // messages.js
 import { requireAdmin } from "./admin-auth.js";
 import { renderAdminShell, showToast } from "./admin-shell.js";
-import { db } from "../../js/firebase-init.js";
+import { db } from "../../public/js/firebase-init.js";
 import { collection, getDocs, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 async function boot() {

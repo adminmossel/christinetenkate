@@ -1,5 +1,5 @@
 // admin-login.js
-import { auth } from "../../js/firebase-init.js";
+import { auth } from "../../public/js/firebase-init.js";
 import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,

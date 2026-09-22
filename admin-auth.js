@@ -7,11 +7,11 @@
 //
 // Belangrijk: dit is de check aan de "voorkant" voor een prettige gebruikers-
 // ervaring (meteen terugsturen naar de inlogpagina). De ECHTE beveiliging
-// zit in de Firestore Security Rules — die controleren dit op exact
+// zit in de Firestore/Storage Security Rules — die controleren dit exact
 // dezelfde manier aan de serverkant, dus een bezoeker kan deze check nooit
 // omzeilen door bijvoorbeeld JavaScript uit te zetten.
 
-import { auth, db } from "../../js/firebase-init.js";
+import { auth, db } from "../../public/js/firebase-init.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 

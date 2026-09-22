@@ -9,7 +9,7 @@
 // werken — het is geen alles-of-niets-afhankelijkheid.
 
 import { openLinkPicker } from "./link-picker.js";
-import { resolveLink } from "../../js/render.js";
+import { resolveLink } from "../../public/js/render.js";
 
 const SPECIAL_CHARS = ["€", "©", "®", "™", "°", "§", "•", "…", "–", "—", "½", "¼", "¾", "→", "✓"];
 

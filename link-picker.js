@@ -3,9 +3,9 @@
 // externe website, een e-mailadres, een telefoonnummer, een anker op de
 // pagina, of een bestand uit de mediabibliotheek.
 
-import { db } from "../../js/firebase-init.js";
+import { db } from "../../public/js/firebase-init.js";
 import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { openMediaPicker, fetchMediaMap } from "./media-picker.js";
+import { openMediaPicker } from "./media-picker.js";
 
 const TYPE_LABELS = {
   page: "Pagina op de website",
@@ -80,24 +80,17 @@ export function openLinkPicker(initialLink = null) {
           </div>
         `;
       } else if (type === "file") {
-        const existingName = currentValue && currentTypeOf(initialLink) === "file" ? "Bestand geladen…" : "";
         targetField.innerHTML = `
           <div class="admin-field">
             <label>Bestand</label>
             <button type="button" class="btn-admin" id="link-pick-file">${currentValue ? "Ander bestand kiezen" : "Kies bestand uit mediabibliotheek"}</button>
-            <div id="link-file-name" style="font-size:var(--fs-sm);margin-top:6px;">${existingName}</div>
+            <div id="link-file-name" style="font-size:var(--fs-sm);margin-top:6px;">${currentValue || ""}</div>
           </div>
         `;
-        if (existingName) {
-          fetchMediaMap([currentValue]).then((map) => {
-            const nameEl = targetField.querySelector("#link-file-name");
-            if (nameEl) nameEl.textContent = map[currentValue]?.name || "Bestand niet gevonden";
-          });
-        }
         targetField.querySelector("#link-pick-file").addEventListener("click", async () => {
           const media = await openMediaPicker({ accept: "any" });
           if (media) {
-            currentValue = media.id;
+            currentValue = media.url;
             targetField.querySelector("#link-file-name").textContent = media.name;
           }
         });

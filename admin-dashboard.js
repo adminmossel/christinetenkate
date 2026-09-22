@@ -2,10 +2,10 @@
 import { requireAdmin, getCurrentAdmin } from "./admin-auth.js";
 import { renderAdminShell, showToast } from "./admin-shell.js";
 import { slugify, ensureUniqueSlug } from "./slugify.js";
-import { db } from "../../js/firebase-init.js";
+import { db } from "../../public/js/firebase-init.js";
 import {
   collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, where,
-  serverTimestamp,
+  orderBy, serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 let currentView = "active";
@@ -35,23 +35,13 @@ async function loadPages() {
   tbody.innerHTML = `<tr><td colspan="5">Pagina's worden geladen…</td></tr>`;
 
   try {
-    // Bewust GEEN orderBy() in de query zelf: een filter (where) combineren
-    // met een sortering op een ander veld vereist in Firestore een
-    // handmatig aangemaakte "composite index" — dat was precies de oorzaak
-    // van de foutmelding "Er ging iets mis". In plaats daarvan sorteren we
-    // hier gewoon zelf, na het ophalen; voor een site met een handvol
-    // pagina's maakt dat geen merkbaar verschil, en het scheelt weer een
-    // handmatige Firebase-instelling.
-    const q = query(collection(db, "pages"), where("trashed", "==", currentView === "trash"));
+    const q = currentView === "trash"
+      ? query(collection(db, "pages"), where("trashed", "==", true))
+      : query(collection(db, "pages"), where("trashed", "==", false), orderBy("updatedAt", "desc"));
     const snap = await getDocs(q);
-    const docs = [...snap.docs].sort((a, b) => {
-      const aTime = a.data().updatedAt?.toMillis?.() || 0;
-      const bTime = b.data().updatedAt?.toMillis?.() || 0;
-      return bTime - aTime;
-    });
 
     document.getElementById("seed-banner")?.remove();
-    if (docs.length === 0) {
+    if (snap.empty) {
       tbody.innerHTML = `<tr><td colspan="5">${currentView === "trash" ? "De prullenbak is leeg." : "Nog geen pagina's."}</td></tr>`;
       if (currentView === "active") {
         const banner = document.createElement("div");
@@ -65,7 +55,7 @@ async function loadPages() {
     }
 
     tbody.innerHTML = "";
-    docs.forEach((docSnap) => {
+    snap.docs.forEach((docSnap) => {
       const page = docSnap.data();
       const row = document.createElement("tr");
       row.innerHTML = `
