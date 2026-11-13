@@ -22,27 +22,16 @@ function highlightTerm(text, term) {
   return escaped.replace(new RegExp(`(${escTerm})`, "gi"), "<u>$1</u>");
 }
 
-/** Haalt alle platte tekst uit een blokken-array, incl. geneste kolommen. */
-function extractText(blocks) {
-  const parts = [];
-  (blocks || []).forEach((block) => {
-    switch (block.type) {
-      case "heading": case "hero":
-        if (block.text) parts.push(block.text);
-        if (block.title) parts.push(block.title);
-        if (block.lead) parts.push(block.lead);
-        if (block.eyebrow) parts.push(block.eyebrow);
-        break;
-      case "text": if (block.html) parts.push(block.html.replace(/<[^>]*>/g, " ")); break;
-      case "quote": if (block.text) parts.push(block.text); if (block.cite) parts.push(block.cite); break;
-      case "button": if (block.text) parts.push(block.text); break;
-      case "file": if (block.label) parts.push(block.label); break;
-      case "faq": (block.items || []).forEach((i) => { if (i.question) parts.push(i.question); if (i.answer) parts.push(i.answer); }); break;
-      case "tiles": (block.items || []).forEach((i) => { if (i.title) parts.push(i.title); if (i.text) parts.push(i.text); }); break;
-      case "columns": (block.items || []).forEach((col) => parts.push(extractText(col?.blocks))); break;
-      default: break;
-    }
-  });
+/** Haalt alle platte tekst uit een blokken-array (alle bloktypes, ook geneste kolommen en vakken). */
+const TEXT_KEYS = new Set(["text", "title", "lead", "eyebrow", "html", "question", "answer", "label", "name", "role", "cite", "caption", "features", "day", "time", "note", "intro", "address", "value", "prefix", "suffix", "price", "period", "date", "c1", "c2", "c3", "c4", "buttonText", "linkText"]);
+function extractText(node, parts = []) {
+  if (Array.isArray(node)) { node.forEach((n) => extractText(n, parts)); return parts.join(" "); }
+  if (!node || typeof node !== "object") return parts.join(" ");
+  for (const [key, val] of Object.entries(node)) {
+    if (key === "style" || key === "link" || key === "buttonLink") continue;
+    if (typeof val === "string") { if (TEXT_KEYS.has(key) && val) parts.push(key === "html" ? val.replace(/<[^>]*>/g, " ") : val); }
+    else extractText(val, parts);
+  }
   return parts.join(" ");
 }
 

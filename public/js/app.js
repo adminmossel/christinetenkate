@@ -15,7 +15,7 @@
 import { db } from "./firebase-init.js";
 import { collection, query, where, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { initLayout } from "./layout.js";
-import { renderBlocks, collectMediaIds } from "./render.js";
+import { renderBlocks, collectPageMediaIds, applyPageTheme } from "./render.js";
 import { fetchMediaMap } from "../admin/js/media-picker.js";
 import { initContactForms } from "./contact-form.js";
 import { initCookieBanner } from "./cookie-banner.js";
@@ -127,7 +127,8 @@ async function loadPage() {
     const page = snap.docs[0].data();
     applySeo(page);
     renderBreadcrumb(page, slug);
-    const mediaMap = await fetchMediaMap(collectMediaIds(page.blocks || []));
+    const mediaMap = await fetchMediaMap(collectPageMediaIds(page));
+    applyPageTheme(page.theme, mediaMap); // achtergrond, kleuren, lettertype per pagina
     renderBlocks(page.blocks || [], content, mediaMap);
     initContactForms();
     initBackToTop(page.showBackToTop !== false);

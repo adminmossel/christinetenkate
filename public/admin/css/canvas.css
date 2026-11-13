@@ -1,0 +1,60 @@
+/* canvas.css — alleen binnen de iframe van de editor (admin/canvas.html) */
+:root { --cv-blue: #0071E3; }
+html { scroll-behavior: auto; }
+body { position: relative; min-height: 100vh; }
+
+/* Header/footer zijn een echte kloon maar niet klikbaar */
+#site-header, #site-footer, #sticky-contact, .back-to-top, .cookie-banner { pointer-events: none; user-select: none; }
+.content-blocks > * { animation: none !important; }
+
+.blk { cursor: default; }
+.blk--is-hidden { opacity: 0.35; }
+.blk--is-hidden::after { content: "Verborgen op de website"; position: absolute; top: 6px; left: 50%; transform: translateX(-50%); background: #1D1D1F; color: #fff; font: 600 11px/1 system-ui, sans-serif; padding: 5px 10px; border-radius: 999px; z-index: 5; }
+/* Verborgen-op-mobiel/desktop blokken blijven zichtbaar in de editor */
+.blk--hide-m, .blk--hide-d { display: block !important; }
+
+.blk.is-hover:not(.is-selected) { outline: 1.5px dashed rgba(0, 113, 227, 0.7); outline-offset: -1.5px; }
+.blk.is-hover:not(.is-selected)::before {
+  content: attr(data-label); position: absolute; top: 0; left: 0; z-index: 20; background: rgba(0,113,227,0.92); color: #fff;
+  font: 600 11px/1 system-ui, sans-serif; padding: 4px 8px; border-radius: 0 0 6px 0; pointer-events: none;
+}
+.blk.is-selected { outline: 2px solid var(--cv-blue); outline-offset: -2px; }
+.blk.is-dragging { opacity: 0.4; }
+
+[data-field], [data-rich-field] { cursor: text; }
+[data-field]:hover, [data-rich-field]:hover { background: rgba(0,113,227,0.06); border-radius: 4px; }
+.is-editing { outline: 2px solid var(--cv-blue) !important; outline-offset: 3px; border-radius: 4px; background: rgba(0,113,227,0.05); cursor: text; }
+
+/* Gereedschap bij het geselecteerde blok */
+#cv-ui { position: absolute; pointer-events: none; z-index: 400; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+#cv-ui[hidden] { display: none; }
+#cv-ui button { pointer-events: auto; font-family: inherit; cursor: pointer; }
+.cv-chip { position: absolute; top: -26px; left: 0; background: var(--cv-blue); color: #fff; font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 8px 8px 0 0; pointer-events: none; white-space: nowrap; }
+.cv-tools { position: absolute; top: -34px; right: 0; display: flex; gap: 2px; background: #1D1D1F; padding: 4px; border-radius: 10px; box-shadow: 0 6px 18px rgba(0,0,0,0.25); }
+.cv-tools button { width: 30px; height: 28px; border: none; background: transparent; color: #fff; border-radius: 6px; font-size: 15px; line-height: 1; }
+.cv-tools button:hover { background: rgba(255,255,255,0.18); }
+.cv-tools .cv-drag { cursor: grab; }
+.cv-tools .cv-danger:hover { background: #D70015; }
+#cv-ui.is-inside .cv-chip { top: 0; border-radius: 0 0 8px 0; }
+#cv-ui.is-inside .cv-tools { top: 6px; right: 6px; }
+.cv-add { position: absolute; left: 50%; width: 28px; height: 28px; margin-left: -14px; border-radius: 50%; border: 2px solid #fff; background: var(--cv-blue); color: #fff; font-size: 18px; line-height: 1; box-shadow: 0 2px 8px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; padding: 0; transition: transform 120ms; }
+.cv-add:hover { transform: scale(1.15); }
+.cv-add--top { top: -14px; } .cv-add--bottom { bottom: -14px; }
+
+/* Neerzet-lijn bij slepen */
+#cv-drop { position: absolute; height: 4px; border-radius: 4px; background: var(--cv-blue); z-index: 500; pointer-events: none; box-shadow: 0 0 0 3px rgba(0,113,227,0.25); }
+#cv-drop[hidden] { display: none; }
+
+/* Onderaan / lege pagina */
+.cv-end { padding: 28px var(--space-4) 60px; text-align: center; }
+.cv-end > button, .cv-empty button { border: 2px dashed rgba(0,113,227,0.5); background: rgba(0,113,227,0.05); color: var(--cv-blue); font: 600 15px system-ui, sans-serif; padding: 14px 28px; border-radius: 14px; cursor: pointer; }
+.cv-end > button:hover, .cv-empty button:hover { background: rgba(0,113,227,0.12); }
+.cv-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 70px 20px; font-family: system-ui, sans-serif; color: #555; }
+.cv-empty strong { font-size: 20px; color: #1D1D1F; }
+.drop-hint { background: rgba(0,113,227,0.04); border-color: rgba(0,113,227,0.35) !important; color: var(--cv-blue) !important; font-family: system-ui, sans-serif; }
+
+/* Voorbeeld-modus: geen bewerkhulpmiddelen */
+.cv-preview .blk { outline: none !important; }
+.cv-preview #cv-ui, .cv-preview .cv-end, .cv-preview .drop-hint, .cv-preview .blk::before { display: none !important; }
+.cv-preview .blk--is-hidden { display: none !important; }
+.cv-preview [data-field]:hover, .cv-preview [data-rich-field]:hover { background: none; }
