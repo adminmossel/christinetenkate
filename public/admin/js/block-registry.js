@@ -100,7 +100,7 @@ export const BLOCKS = {
     label: "Lijst met pictogrammen", group: "Tekst", icon: "list", keywords: ["lijst", "opsomming", "checklist", "bullets"],
     defaults: () => ({ icon: "check", columns: 1, items: [{ text: "Eerste punt" }, { text: "Tweede punt" }, { text: "Derde punt" }] }),
     fields: [F.items("items", "Punten", "text", [F.text("text", "Tekst")], () => ({ text: "Nieuw punt" })),
-      F.select("icon", "Pictogram", [...ICON_OPTIONS.map((i) => [i, i]), ["number", "Nummers"], ["dot", "Bolletje"]]), F.range("columns", "Kolommen", 1, 3)],
+      F.select("icon", "Pictogram", [["square", "Vierkantje"], ...ICON_OPTIONS.map((i) => [i, i]), ["number", "Nummers"], ["dot", "Bolletje"]]), F.range("columns", "Kolommen", 1, 3)],
   },
   callout: {
     label: "Infobox", group: "Tekst", icon: "info", keywords: ["info", "tip", "waarschuwing", "melding", "notitie", "callout"],
@@ -191,7 +191,7 @@ export const BLOCKS = {
     label: "Kaarten", group: "Kaarten & lijsten", icon: "grid", keywords: ["kaarten", "cards", "tegels", "blokken", "diensten"],
     defaults: () => ({ columns: 3, variant: "raised", imageRatio: "16:10".replace(":", ":"), items: [{ mediaId: null, title: "Eerste kaart", text: "Korte omschrijving.", link: null, linkText: "" }, { mediaId: null, title: "Tweede kaart", text: "Korte omschrijving.", link: null, linkText: "" }, { mediaId: null, title: "Derde kaart", text: "Korte omschrijving.", link: null, linkText: "" }] }),
     fields: [F.items("items", "Kaarten", "title", [F.media("mediaId", "Afbeelding (optioneel)"), F.text("title", "Titel"), F.area("text", "Tekst"), F.link("link", "Link"), F.text("linkText", "Linktekst", { placeholder: "Lees verder" })], () => ({ mediaId: null, title: "Nieuwe kaart", text: "", link: null, linkText: "" })),
-      F.range("columns", "Kaarten naast elkaar", 1, 4), F.select("variant", "Uiterlijk", [["raised", "Met schaduw"], ["outline", "Met rand"], ["flat", "Vlak"]]), F.select("imageRatio", "Vorm afbeelding", RATIOS)],
+      F.range("columns", "Kaarten naast elkaar", 1, 4), F.select("variant", "Uiterlijk", [["blocks", "Gekleurde blokken"], ["raised", "Met schaduw"], ["outline", "Met rand"], ["flat", "Vlak"]]), F.select("imageRatio", "Vorm afbeelding", RATIOS)],
   },
   features: {
     label: "Voordelen met pictogram", group: "Kaarten & lijsten", icon: "sparkle", keywords: ["voordelen", "features", "pictogram", "icoon", "diensten"],

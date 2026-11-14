@@ -13,15 +13,15 @@
 import { requireAdmin } from "./admin-auth.js";
 import { renderAdminShell, showToast } from "./admin-shell.js";
 import { db } from "../../js/firebase-init.js";
-import { collection, getDocs, getDoc, doc, updateDoc, deleteField, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { buildPalette, restyleBlocks, restyleTheme, verifyRestyle } from "./restyle-rules.js";
+import { collection, getDocs, getDoc, doc, updateDoc, setDoc, deleteField, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { restyleBlocks, restyleTheme, verifyRestyle, STUDIO_COLORS } from "./restyle-rules.js";
 
 const clone = (v) => JSON.parse(JSON.stringify(v));
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 const $ = (s, r = document) => r.querySelector(s);
 
 let pages = [];
-let pal = buildPalette();
+let settingsData = {};
 let canvasReady = false;
 let pendingView = null;
 
@@ -43,10 +43,10 @@ function analyse(p) {
   const blocks = p.blocks || [];
   if (!blocks.length) return { applied, ok: false, reason: "de pagina is leeg", oldBlocks: blocks, oldTheme: p.theme || {} };
   try {
-    const newBlocks = restyleBlocks(blocks, pal);
+    const newBlocks = restyleBlocks(blocks);
     const check = verifyRestyle(blocks, newBlocks);
     if (!check.ok) return { applied, ok: false, reason: check.reason, oldBlocks: blocks, oldTheme: p.theme || {} };
-    return { applied, ok: true, oldBlocks: blocks, oldTheme: p.theme || {}, newBlocks, newTheme: restyleTheme(p.theme, pal) };
+    return { applied, ok: true, oldBlocks: blocks, oldTheme: p.theme || {}, newBlocks, newTheme: restyleTheme(p.theme) };
   } catch (err) {
     console.error(err);
     return { applied, ok: false, reason: "onverwachte fout bij omzetten", oldBlocks: blocks, oldTheme: p.theme || {} };
@@ -56,8 +56,8 @@ function analyse(p) {
 async function load() {
   try {
     const s = await getDoc(doc(db, "settings", "site"));
-    if (s.exists()) pal = buildPalette(s.data().colors || {});
-  } catch { /* standaardkleuren */ }
+    settingsData = s.exists() ? s.data() : {};
+  } catch { settingsData = {}; }
   const snap = await getDocs(collection(db, "pages"));
   pages = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   pages.sort((a, b) => (a.slug === "home" ? -1 : b.slug === "home" ? 1 : String(a.title).localeCompare(String(b.title))));
@@ -76,9 +76,9 @@ function render() {
   banner.innerHTML = "";
   const box = document.createElement("div");
 
-  if (applied.length) {
+  if (applied.length || colorsApplied()) {
     box.className = "rs-banner rs-banner--done";
-    box.innerHTML = `<div><strong>De nieuwe opmaak staat aan op ${applied.length} ${applied.length === 1 ? "pagina" : "pagina’s"}.</strong><p>Niet tevreden? Met de knop hiernaast zet je alles in één keer terug naar hoe het was. Wijzigingen die je ná het toepassen hebt gemaakt op deze pagina’s gaan dan verloren.</p></div>
+    box.innerHTML = `<div><strong>De nieuwe opmaak staat aan op ${applied.length} ${applied.length === 1 ? "pagina" : "pagina’s"}${colorsApplied() ? " en de kleuren van de site zijn aangepast" : ""}.</strong><p>Niet tevreden? Met de knop hiernaast zet je alles in één keer terug naar hoe het was. Wijzigingen die je ná het toepassen hebt gemaakt op deze pagina’s gaan dan verloren.</p></div>
       <div class="rs-banner__btns">${ready.length ? `<button class="btn-admin" id="rs-apply-all">Ook toepassen op de rest (${ready.length})</button>` : ""}<button class="btn-admin btn-admin--primary" id="rs-restore-all">↩ Alles terugzetten naar de oude opmaak</button></div>`;
   } else if (ready.length) {
     box.className = "rs-banner rs-banner--new";
@@ -113,6 +113,26 @@ function render() {
   });
 }
 
+// Kleuren van de hele site (menubalk, voettekst, knoppen, links, achtergrond)
+const colorsApplied = () => settingsData.hadColors !== undefined;
+
+async function applyColors() {
+  if (colorsApplied()) return;
+  const had = !!settingsData.colors;
+  await setDoc(doc(db, "settings", "site"), {
+    colors: { ...(settingsData.colors || {}), ...STUDIO_COLORS },
+    preRestyleColors: settingsData.colors || {},
+    hadColors: had,
+  }, { merge: true });
+}
+
+async function restoreColors() {
+  if (!colorsApplied()) return;
+  const data = { preRestyleColors: deleteField(), hadColors: deleteField() };
+  data.colors = settingsData.hadColors ? settingsData.preRestyleColors || {} : deleteField();
+  await setDoc(doc(db, "settings", "site"), data, { merge: true });
+}
+
 // ---------------------------------------------------------------
 // Toepassen / terugzetten
 // ---------------------------------------------------------------
@@ -138,8 +158,9 @@ async function applyPages(targets) {
 async function applyAll() {
   const n = pages.filter((p) => !p._a.applied && p._a.ok).length;
   if (!n) return;
-  if (!confirm(`De nieuwe opmaak toepassen op ${n} ${n === 1 ? "pagina" : "pagina’s"}?\n\nDe teksten blijven precies hetzelfde. Je kunt altijd met één knop terug.`)) return;
+  if (!confirm(`De nieuwe opmaak toepassen op ${n} ${n === 1 ? "pagina" : "pagina’s"}?\n\nDe teksten blijven precies hetzelfde. Ook de kleuren van de hele site (menubalk, voettekst, knoppen) veranderen mee. Je kunt altijd met één knop terug.`)) return;
   await applyPages(pages);
+  try { await applyColors(); await load(); } catch (err) { console.error(err); showToast("De pagina’s zijn gedaan, maar de sitekleuren konden niet worden aangepast.", true); }
 }
 
 async function restorePages(targets) {
@@ -159,9 +180,10 @@ async function restorePages(targets) {
 
 async function restoreAll() {
   const n = pages.filter((p) => p._a.applied).length;
-  if (!n) return;
-  if (!confirm(`Alle ${n} ${n === 1 ? "pagina" : "pagina’s"} terugzetten naar de oude opmaak?\n\nWijzigingen die je ná het toepassen van de nieuwe opmaak op deze pagina’s hebt gemaakt, gaan verloren.`)) return;
+  if (!n && !colorsApplied()) return;
+  if (!confirm(`Alles terugzetten naar de oude opmaak (${n} ${n === 1 ? "pagina" : "pagina’s"} en de sitekleuren)?\n\nWijzigingen die je ná het toepassen van de nieuwe opmaak op deze pagina’s hebt gemaakt, gaan verloren.`)) return;
   await restorePages(pages);
+  try { await restoreColors(); await load(); } catch (err) { console.error(err); showToast("De pagina’s zijn teruggezet, maar de sitekleuren niet.", true); }
 }
 
 // ---------------------------------------------------------------

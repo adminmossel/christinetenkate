@@ -334,6 +334,9 @@ const SPACING = [
 ];
 
 const SHAPE = [
+  { type: "toggle", key: "ruleTop", label: "Lijn boven dit onderdeel" },
+  { type: "range", key: "ruleWidth", label: "Dikte van de lijn", min: 1, max: 12, unit: "px", fallback: 2, showIf: (s) => s.ruleTop },
+  { type: "color", key: "ruleColor", label: "Kleur van de lijn", showIf: (s) => s.ruleTop },
   { type: "toggle", key: "boxed", label: "Tonen als afgeronde kaart (ingesprongen)" },
   { type: "range", key: "radius", label: "Hoekafronding", min: 0, max: 60, unit: "px", resettable: true, fallback: 22 },
   { type: "range", key: "borderWidth", label: "Rand", min: 0, max: 8, unit: "px", fallback: 0 },
@@ -359,6 +362,7 @@ export const PAGE_STYLE_SECTIONS = [
   { id: "bg", title: "Achtergrond van de pagina", fields: BACKGROUND },
   { id: "colors", title: "Kleuren & lettertype", fields: COLORS },
   { id: "chrome", title: "Weergave", fields: [
+    { type: "select", key: "look", label: "Opmaakstijl van de pagina", options: [{ value: "", label: "Klassiek (zoals voorheen)" }, { value: "studio", label: "Studio (nieuwe opmaak)" }] },
     { type: "toggle", key: "hideHeader", label: "Menubalk (header) verbergen op deze pagina" },
     { type: "toggle", key: "hideFooter", label: "Voettekst (footer) verbergen op deze pagina" },
   ] },

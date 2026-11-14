@@ -186,6 +186,7 @@ export const FONT_SETS = {
   modern: { label: "Modern (Poppins)", display: "'Poppins', sans-serif", body: "'Poppins', sans-serif", href: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" },
   friendly: { label: "Vriendelijk (Nunito)", display: "'Nunito', sans-serif", body: "'Nunito', sans-serif", href: "https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" },
   elegant: { label: "Elegant (Cormorant + Montserrat)", display: "'Cormorant Garamond', Georgia, serif", body: "'Montserrat', sans-serif", href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Montserrat:wght@400;500;600&display=swap" },
+  studio: { label: "Studio (Young Serif + Atkinson)", display: "'Young Serif', Georgia, serif", body: "'Atkinson Hyperlegible', 'Segoe UI', sans-serif", href: "https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Young+Serif&display=swap" },
   clean: { label: "Strak (Inter)", display: "'Inter', sans-serif", body: "'Inter', sans-serif", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" },
 };
 
@@ -264,6 +265,11 @@ export function styleToCss(s = {}, mediaMap = {}) {
   if (num(s.borderWidth, 0) > 0) css["border"] = `${clamp(s.borderWidth, 0, 12)}px solid ${isCssColor(s.borderColor) ? s.borderColor : "var(--color-line)"}`;
   if (SHADOWS[s.shadow]) css["box-shadow"] = SHADOWS[s.shadow];
   if (["left", "center", "right"].includes(s.textAlign)) css["text-align"] = s.textAlign;
+  if (s.ruleTop) {
+    classes.push("blk--rule");
+    vars["--rule-w"] = `${clamp(num(s.ruleWidth, 2), 1, 12)}px`;
+    if (isCssColor(s.ruleColor)) vars["--rule-c"] = s.ruleColor;
+  }
   if (s.hideMobile) classes.push("blk--hide-m");
   if (s.hideDesktop) classes.push("blk--hide-d");
   return { css, vars, classes };
@@ -288,6 +294,7 @@ export function applyPageTheme(theme, mediaMap = {}, doc = document) {
   const main = doc.getElementById("page-content");
   ["background-color", "background-image", "background-size", "background-position", "background-repeat", "background-attachment", "--font-display", "--font-body"].forEach((p) => body.style.removeProperty(p));
   body.classList.remove("page--no-header", "page--no-footer");
+  [...body.classList].filter((c) => c.startsWith("look-")).forEach((c) => body.classList.remove(c));
   if (main) {
     [...main.style].forEach((p) => main.style.removeProperty(p));
     main.classList.remove("blk--dark", "blk--light");
@@ -300,6 +307,7 @@ export function applyPageTheme(theme, mediaMap = {}, doc = document) {
     Object.entries(vars).forEach(([k, v]) => { if (v && !k.startsWith("--font") && !k.startsWith("--blk")) main.style.setProperty(k, v); });
     classes.filter((c) => c === "blk--dark" || c === "blk--light").forEach((c) => main.classList.add(c));
   }
+  if (theme.look && /^[a-z]+$/.test(theme.look)) body.classList.add(`look-${theme.look}`);
   if (theme.hideHeader) body.classList.add("page--no-header");
   if (theme.hideFooter) body.classList.add("page--no-footer");
 }
@@ -679,7 +687,7 @@ function cardGrid(className, cols) {
 }
 
 function renderCardsBlock(block, mediaMap) {
-  const grid = cardGrid(`cards cards--${pick(block.variant, ["raised", "outline", "flat"], "raised")}`, block.columns);
+  const grid = cardGrid(`cards cards--${pick(block.variant, ["raised", "outline", "flat", "blocks"], "raised")}`, block.columns);
   (block.items || []).forEach((item) => {
     const card = el("div", "card");
     const media = mediaMap[item.mediaId];
@@ -859,6 +867,7 @@ function renderListBlock(block) {
     const ic = el("span", "block-list__icon");
     if (block.icon === "number") ic.textContent = String(i + 1);
     else if (block.icon === "dot") ic.textContent = "•";
+    else if (block.icon === "square") { ic.className = "block-list__sq"; }
     else ic.innerHTML = iconSvg(block.icon || "check");
     li.appendChild(ic);
     li.appendChild(txt("span", "block-list__text", item.text));

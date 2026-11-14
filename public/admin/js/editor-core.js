@@ -654,7 +654,7 @@ const TOUR_STEPS = [
   { target: ".ed-right", title: "3. Opties aan de rechterkant", text: "Zodra je iets hebt aangeklikt, kun je hier de tekst, foto’s en kleuren veranderen. Klik je nergens op, dan stel je hier de achtergrond van de hele pagina in." },
   { target: "#ed-stage", title: "4. De knopjes boven een onderdeel", text: "Boven het gekozen onderdeel staan knopjes: ⠿ vasthouden en slepen, ↑ ↓ omhoog of omlaag, ⎘ een kopie maken en 🗑 weghalen." },
   { target: ".ed-hist", title: "Per ongeluk iets gedaan?", text: "Geen zorgen. Klik op ↶ om de laatste stap ongedaan te maken." },
-  { target: ".ed-top__right", title: "5. Opslaan en publiceren", text: "Je werk wordt vanzelf bewaard. Bezoekers zien de wijzigingen pas als je op ‘Publiceren’ klikt." },
+  { target: ".ed-top__right", title: "5. Opslaan en publiceren", text: "Je werk wordt vanzelf bewaard. Let op: is de pagina al gepubliceerd, dan zien bezoekers wijzigingen meteen. Bij een concept zien ze pas iets na ‘Publiceren’." },
   { target: "#ed-gear", title: "6. Het tandwieltje", text: "Hier staat de titel zoals Google hem toont, het adres van de pagina en oudere versies waar je naar terug kunt." },
   { target: null, title: "Klaar!", text: "Je kunt deze uitleg altijd opnieuw bekijken met de knop ‘? Uitleg’ bovenin." },
 ];

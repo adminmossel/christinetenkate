@@ -119,8 +119,9 @@
 .icon { width: 1.25em; height: 1.25em; flex-shrink: 0; }
 
 /* ============ Bestaande blokken, uitgebreid ============ */
-.block-quote--big { text-align: center; font-size: var(--fs-xl); border-left: none; background: none; padding: var(--space-4) var(--space-3); max-width: 28em; margin: 0 auto; }
-.block-quote--big::before { position: static; display: block; font-size: 4rem; height: 0.5em; }
+.block-quote--big { text-align: left; font-family: var(--font-display); font-style: normal; font-size: clamp(1.6rem, 3.4vw, 2.5rem); line-height: 1.22; border: none; background: none; padding: 0; max-width: 22em; margin: 0; color: var(--color-primary); }
+.block-quote--big::before { content: ""; position: static; display: block; width: 64px; height: 6px; background: var(--color-accent); margin: 0 0 var(--space-3); font-size: 0; }
+.block-quote--big cite { display: block; margin-top: var(--space-3); font-family: var(--font-body); font-size: var(--fs-sm); font-style: normal; color: var(--color-ink-soft); }
 .block-quote--plain { background: none; border-left: 3px solid var(--color-line); border-radius: 0; font-size: var(--fs-md); }
 .block-quote--plain::before { display: none; }
 
@@ -340,3 +341,96 @@
 
 /* ============ Lege plek in een kolom/vak (alleen in de editor zichtbaar) ============ */
 .drop-hint { border: 2px dashed var(--color-line); border-radius: var(--radius-md); padding: var(--space-4) var(--space-3); text-align: center; color: var(--color-ink-soft); font-size: var(--fs-sm); }
+
+
+/* ============ Lijn boven een onderdeel (hoofdstuk-lijn / kleurlijn) ============ */
+.blk--rule > .blk__inner::before { content: ""; display: block; border-top: var(--rule-w, 2px) solid var(--rule-c, currentColor); margin-bottom: var(--space-4); }
+.blk--nested.blk--rule > .blk__inner::before { margin-bottom: var(--space-3); }
+
+/* Vierkant opsommingsteken (past bij de letterblokjes uit het logo) */
+.block-list__sq { width: 11px; height: 11px; border-radius: 2px; background: var(--color-accent); flex-shrink: 0; margin: 0.5em 8px 0 0; }
+.block-list li:has(.block-list__sq) { gap: 8px; }
+
+/* Kaarten als gekleurde blokken */
+:root { --studio-green: #8FA800; --studio-green-soft: #E6EDBE; --studio-blue-soft: #D9E4F2; --studio-red-soft: #F6D9D3; --studio-paper-2: #F3EBD6; }
+.cards--blocks .card { border-radius: 6px; box-shadow: none; background: var(--studio-paper-2); color: #1A2433; --color-ink: #1A2433; --color-ink-soft: #44506A; --color-primary: #123A6B; }
+.cards--blocks .card:nth-child(4n+1) { background: var(--studio-green-soft); }
+.cards--blocks .card:nth-child(4n+2) { background: var(--studio-blue-soft); }
+.cards--blocks .card:nth-child(4n+3) { background: var(--studio-red-soft); }
+.cards--blocks .card:nth-child(4n+4) { background: #FFFFFF; }
+.cards--blocks .card__body p { font-size: 1rem; }
+.cards--blocks .card:hover { transform: none; box-shadow: none; }
+.cards--blocks .card__body { padding: var(--space-4); }
+.cards--blocks .card__body h3 { font-size: var(--fs-lg); }
+.cards--blocks .card__link { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+
+/* ================================================================
+   LOOK "STUDIO" — alleen actief als de pagina de opmaakstijl Studio heeft
+   (body.look-studio). Rustig en redactioneel: vlakke kleuren, geen
+   schaduwen of verlopen, scherpere hoeken, grote koppen.
+   ================================================================ */
+.look-studio {
+  --radius-sm: 3px; --radius-md: 6px; --radius-lg: 10px;
+  --shadow-soft: none; --shadow-md: none; --shadow-lg: none;
+  line-height: 1.65;
+}
+.look-studio :is(h1, h2, h3, h4, h5, h6, .hero__title, .banner__title) { font-weight: 400; letter-spacing: -0.015em; }
+.look-studio h1, .look-studio .hero__title { font-size: clamp(2.7rem, 6.4vw, 4.8rem); line-height: 1.02; }
+.look-studio h2 { font-size: clamp(2rem, 4.2vw, 3.1rem); line-height: 1.08; }
+.look-studio h3 { font-size: clamp(1.4rem, 2.4vw, 1.8rem); line-height: 1.15; }
+.look-studio h4 { font-size: 1.25rem; }
+.look-studio .eyebrow, .look-studio .hero__eyebrow, .look-studio .banner__eyebrow {
+  font-family: var(--font-body); font-style: normal; text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.78rem; font-weight: 700; color: var(--color-accent);
+}
+
+/* Header: een gewone, vlakke balk met een lijn — geen zwevend dock */
+.look-studio .site-header, .look-studio .site-header.is-scrolled { top: 0; padding: 0; }
+.look-studio .site-header__island, .look-studio .site-header.is-scrolled .site-header__island {
+  display: flex; justify-content: flex-end; max-width: none; padding: 14px var(--space-4); border: none; border-bottom: 2px solid var(--color-primary);
+  border-radius: 0; background: var(--color-bg); backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none;
+}
+.look-studio .site-header__island::after { display: none; }
+.look-studio .site-header.is-scrolled .site-header__pinned { max-width: 900px; opacity: 1; margin-left: 0; pointer-events: auto; }
+.look-studio .site-header.is-scrolled .site-header__start { margin-right: auto; }
+.look-studio .site-header.is-scrolled .site-search { justify-self: auto; }
+.look-studio .nav-toggle { border-radius: 8px; }
+.look-studio .site-search input { border-radius: 8px; }
+
+/* Footer: één vlak */
+.look-studio .site-footer { background: var(--color-primary); margin-top: 0; }
+.look-studio .site-footer a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.look-studio .site-footer__bottom { color: rgba(255, 255, 255, 0.75); }
+
+/* Knoppen: strakker en zonder schaduw */
+.look-studio .btn { border-radius: 8px; box-shadow: none; font-weight: 700; padding: 14px 26px; }
+.look-studio .btn:hover, .look-studio .blk .btn:hover { transform: none; box-shadow: none; }
+.look-studio .btn--sm { padding: 9px 18px; }
+
+/* Hero: groot en links, zonder gekleurde vlek */
+.look-studio .hero::before { display: none; }
+.look-studio .hero { padding: 0; }
+.look-studio .hero__lead { font-size: var(--fs-md); max-width: 34em; }
+
+/* Lijsten, kaarten, citaten, vragen, reviews */
+.look-studio .tile, .look-studio .card, .look-studio .block-contact-form { box-shadow: none; }
+.look-studio .tile:hover { transform: none; box-shadow: none; }
+.look-studio .block-faq details { border-radius: 0; border-left: none; border-right: none; border-top: none; border-bottom: 2px solid var(--color-primary); background: transparent; padding: var(--space-3) 0; margin: 0; }
+.look-studio .block-faq summary { font-family: var(--font-display); font-size: 1.3rem; font-weight: 400; }
+.look-studio .block-reviews__title { margin-bottom: var(--space-4); }
+.look-studio .review-card { background: transparent; border: none; box-shadow: none; padding: 0; }
+.look-studio .review-card:hover { transform: none; box-shadow: none; }
+.look-studio .review-card blockquote { font-style: normal; font-size: 1.35rem; line-height: 1.4; }
+.look-studio .review-card__stars { font-size: 0.9rem; }
+.look-studio .block-image img, .look-studio .image-text__media img { box-shadow: none; }
+.look-studio .block-quote--classic { background: none; border-left: 6px solid var(--color-accent); border-radius: 0; }
+.look-studio .block-quote--classic::before { display: none; }
+
+/* Studio: nette linkerlijn, ademruimte, hero zonder plaatje links uitgelijnd */
+.look-studio .blk--w-narrow > .blk__inner { max-width: var(--max-width); }
+.look-studio .blk--w-narrow > .blk__inner > .block-group > .blk { max-width: 780px; }
+.look-studio .block-group > .blk--nested + .blk--nested { margin-top: var(--space-4); }
+.look-studio .cards { gap: var(--space-3); }
+.look-studio .hero--no-image .hero__inner { text-align: left; }
+.look-studio .hero--no-image .hero__lead { margin-left: 0; margin-right: 0; }
+.look-studio .block-reviews__title { text-align: left; }
+.blk--dark .hero__lead, .blk--dark .banner__lead { color: var(--color-ink); }
