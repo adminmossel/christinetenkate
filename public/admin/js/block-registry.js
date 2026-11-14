@@ -82,18 +82,18 @@ export const BLOCKS = {
   // ===== Tekst =====
   heading: {
     label: "Titel", group: "Tekst", icon: "text", keywords: ["kop", "titel", "heading", "h1", "h2"],
-    defaults: () => ({ level: 2, text: "Nieuwe titel", align: "left", eyebrow: "" }),
+    defaults: () => ({ level: 2, text: "Titel", align: "left", eyebrow: "" }),
     fields: [F.text("text", "Titel"), F.select("level", "Niveau", [[1, "H1 — hoofdtitel"], [2, "H2 — grote kop"], [3, "H3"], [4, "H4"], [5, "H5"], [6, "H6"]], { number: true }),
       F.seg("align", "Uitlijning", ALIGN), F.text("eyebrow", "Kleine tekst erboven (optioneel)"), F.text("anchorId", "Anker-ID voor links binnen de pagina (optioneel)")],
   },
   text: {
     label: "Tekst", group: "Tekst", icon: "text", keywords: ["tekst", "paragraaf", "alinea", "text"],
-    defaults: () => ({ html: "<p>Nieuwe tekst… Dubbelklik op het canvas om direct te typen.</p>", align: "left" }),
+    defaults: () => ({ html: "<p>Hier komt je tekst. Dubbelklik op het canvas om direct te typen.</p>", align: "left" }),
     fields: [F.rich("html"), F.seg("align", "Uitlijning", ALIGN)],
   },
   quote: {
     label: "Citaat", group: "Tekst", icon: "quote", keywords: ["quote", "citaat", "uitspraak"],
-    defaults: () => ({ text: "Een mooi citaat…", cite: "", variant: "classic" }),
+    defaults: () => ({ text: "Hier komt het citaat.", cite: "", variant: "classic" }),
     fields: [F.area("text", "Citaat"), F.text("cite", "Bron (optioneel)"), F.select("variant", "Uiterlijk", [["classic", "Klassiek"], ["big", "Groot, gecentreerd"], ["plain", "Eenvoudig"]])],
   },
   list: {
@@ -104,7 +104,7 @@ export const BLOCKS = {
   },
   callout: {
     label: "Infobox", group: "Tekst", icon: "info", keywords: ["info", "tip", "waarschuwing", "melding", "notitie", "callout"],
-    defaults: () => ({ variant: "info", title: "Goed om te weten", text: "Hier staat een belangrijke mededeling." }),
+    defaults: () => ({ variant: "info", title: "Titel", text: "Hier komt de tekst." }),
     fields: [F.select("variant", "Soort", [["info", "Informatie"], ["tip", "Tip"], ["warning", "Let op"], ["success", "Gelukt / positief"]]), F.text("title", "Titel"), F.area("text", "Tekst")],
   },
   table: {
@@ -117,14 +117,14 @@ export const BLOCKS = {
   // ===== Secties =====
   hero: {
     label: "Hero (kop met afbeelding)", group: "Secties", icon: "split", keywords: ["hero", "header", "openingsbeeld", "welkom"],
-    defaults: () => ({ eyebrow: "", title: "Welkom", lead: "Een korte introductie die de bezoeker verwelkomt.", imageMediaId: null, imageAlt: "", imageSide: "right", buttonText: "", buttonLink: null }),
+    defaults: () => ({ eyebrow: "", title: "Titel", lead: "Hier komt een korte introductie.", imageMediaId: null, imageAlt: "", imageSide: "right", buttonText: "", buttonLink: null }),
     fields: [F.text("eyebrow", "Kleine tekst boven de titel"), F.text("title", "Titel"), F.area("lead", "Introductietekst"),
       F.media("imageMediaId", "Afbeelding"), F.text("imageAlt", "Alt-tekst afbeelding"), F.seg("imageSide", "Afbeelding staat", [["left", "Links"], ["right", "Rechts"]]),
       F.text("buttonText", "Knoptekst (optioneel)"), F.link("buttonLink", "Knop-link")],
   },
   banner: {
     label: "Banner met grote foto", group: "Secties", icon: "banner", keywords: ["banner", "cover", "foto", "achtergrond", "hero", "groot"],
-    defaults: () => ({ mediaId: null, overlay: 45, overlayColor: "#000000", minHeight: 460, align: "center", valign: "center", eyebrow: "", title: "Een krachtige titel", lead: "Een korte ondersteunende tekst over de foto.", buttonText: "Meer informatie", buttonLink: null, button2Text: "", button2Link: null }),
+    defaults: () => ({ mediaId: null, overlay: 45, overlayColor: "#000000", minHeight: 460, align: "center", valign: "center", eyebrow: "", title: "Titel", lead: "Hier komt een korte tekst.", buttonText: "Knoptekst", buttonLink: null, button2Text: "", button2Link: null }),
     fields: [F.media("mediaId", "Achtergrondfoto"), F.range("overlay", "Donkerte over de foto (%)", 0, 90), F.color("overlayColor", "Kleur van de sluier"),
       F.range("minHeight", "Hoogte (px)", 240, 800, { step: 10 }), F.seg("align", "Tekst horizontaal", ALIGN), F.seg("valign", "Tekst verticaal", [["top", "Boven"], ["center", "Midden"], ["bottom", "Onder"]]),
       F.text("eyebrow", "Kleine tekst boven de titel"), F.text("title", "Titel"), F.area("lead", "Tekst"),
@@ -132,14 +132,14 @@ export const BLOCKS = {
   },
   cta: {
     label: "Call-to-action", group: "Secties", icon: "megaphone", keywords: ["cta", "actie", "oproep", "banner", "knop"],
-    defaults: () => ({ title: "Klaar om contact op te nemen?", text: "Stuur een bericht en ik neem snel contact met je op.", align: "center", buttonText: "Neem contact op", buttonLink: null, button2Text: "", button2Link: null,
+    defaults: () => ({ title: "Titel", text: "Hier komt een korte tekst.", align: "center", buttonText: "Knoptekst", buttonLink: null, button2Text: "", button2Link: null,
       style: { bg: "color", bgColor: "#2F4A3E", boxed: true, padTop: 48, padBottom: 48 } }),
     fields: [F.text("title", "Titel"), F.area("text", "Tekst"), F.seg("align", "Uitlijning", [["left", "Links"], ["center", "Midden"]]),
       F.text("buttonText", "Knop 1 — tekst"), F.link("buttonLink", "Knop 1 — link"), F.text("button2Text", "Knop 2 — tekst"), F.link("button2Link", "Knop 2 — link")],
   },
   "image-text": {
     label: "Afbeelding + tekst", group: "Secties", icon: "split", keywords: ["afbeelding tekst", "foto naast tekst", "uitgelicht", "split"],
-    defaults: () => ({ mediaId: null, alt: "", imageSide: "left", valign: "center", ratio: "4:3", eyebrow: "", title: "Titel van deze sectie", text: "Vertel hier iets over dit onderwerp. Laat een lege regel tussen alinea's om een nieuwe alinea te beginnen.", buttonText: "", buttonLink: null, buttonStyle: "solid" }),
+    defaults: () => ({ mediaId: null, alt: "", imageSide: "left", valign: "center", ratio: "4:3", eyebrow: "", title: "Titel", text: "Hier komt je tekst. Laat een lege regel tussen alinea's om een nieuwe alinea te beginnen.", buttonText: "", buttonLink: null, buttonStyle: "solid" }),
     fields: [F.media("mediaId", "Afbeelding"), F.text("alt", "Alt-tekst"), F.seg("imageSide", "Afbeelding staat", [["left", "Links"], ["right", "Rechts"]]), F.select("ratio", "Vorm afbeelding", RATIOS),
       F.seg("valign", "Verticaal", [["top", "Boven"], ["center", "Midden"]]), F.text("eyebrow", "Kleine tekst erboven"), F.text("title", "Titel"), F.area("text", "Tekst", { rows: 6 }),
       F.text("buttonText", "Knoptekst (optioneel)"), F.link("buttonLink", "Knop-link"), F.select("buttonStyle", "Knopstijl", BTN_STYLES)],
@@ -181,7 +181,7 @@ export const BLOCKS = {
   },
   logos: {
     label: "Logo-balk", group: "Media", icon: "award", keywords: ["logo", "partners", "keurmerk", "samenwerking"],
-    defaults: () => ({ title: "Bekend van", grayscale: true, images: [] }),
+    defaults: () => ({ title: "", grayscale: true, images: [] }),
     fields: [F.text("title", "Kopje (optioneel)"), F.toggle("grayscale", "Logo’s in grijstinten"),
       F.items("images", "Logo’s", "alt", [F.media("mediaId", "Logo"), F.text("alt", "Naam"), F.link("link", "Link (optioneel)")], () => ({ mediaId: null, alt: "", link: null }))],
   },
@@ -195,7 +195,7 @@ export const BLOCKS = {
   },
   features: {
     label: "Voordelen met pictogram", group: "Kaarten & lijsten", icon: "sparkle", keywords: ["voordelen", "features", "pictogram", "icoon", "diensten"],
-    defaults: () => ({ columns: 3, align: "left", items: [{ icon: "heart", title: "Persoonlijk", text: "Altijd met aandacht." }, { icon: "book", title: "Ervaren", text: "Jarenlange kennis." }, { icon: "smile", title: "Plezierig", text: "Met een lach." }] }),
+    defaults: () => ({ columns: 3, align: "left", items: [{ icon: "star", title: "Titel", text: "Korte omschrijving." }, { icon: "star", title: "Titel", text: "Korte omschrijving." }, { icon: "star", title: "Titel", text: "Korte omschrijving." }] }),
     fields: [F.items("items", "Voordelen", "title", [F.icon("icon"), F.text("title", "Titel"), F.area("text", "Tekst")], () => ({ icon: "star", title: "Nieuw voordeel", text: "" })), F.range("columns", "Naast elkaar", 1, 4), F.seg("align", "Uitlijning", [["left", "Links"], ["center", "Midden"]])],
   },
   team: {
@@ -205,37 +205,37 @@ export const BLOCKS = {
   },
   pricing: {
     label: "Prijzen / pakketten", group: "Kaarten & lijsten", icon: "dollar", keywords: ["prijzen", "pakketten", "tarieven", "pricing", "abonnement"],
-    defaults: () => ({ columns: 3, items: [{ name: "Basis", price: "€ 25", period: "per uur", features: "Eerste voordeel\nTweede voordeel", buttonText: "Kies dit pakket", link: null, highlight: false, badge: "" }, { name: "Plus", price: "€ 45", period: "per uur", features: "Alles van Basis\nExtra voordeel", buttonText: "Kies dit pakket", link: null, highlight: true, badge: "Populair" }] }),
+    defaults: () => ({ columns: 3, items: [{ name: "Naam", price: "€ 0", period: "", features: "Eerste punt\nTweede punt", buttonText: "Knoptekst", link: null, highlight: false, badge: "" }] }),
     fields: [F.items("items", "Pakketten", "name", [F.text("name", "Naam"), F.text("price", "Prijs"), F.text("period", "Per…"), F.area("features", "Voordelen (één per regel)", { rows: 4 }), F.text("buttonText", "Knoptekst"), F.link("link", "Knop-link"), F.toggle("highlight", "Uitgelicht pakket"), F.text("badge", "Label bij uitgelicht", { showIf: (i) => i.highlight })], () => ({ name: "Nieuw pakket", price: "€ 0", period: "", features: "", buttonText: "Kies dit pakket", link: null, highlight: false, badge: "" })), F.range("columns", "Naast elkaar", 1, 4)],
   },
   stats: {
     label: "Cijfers / tellers", group: "Kaarten & lijsten", icon: "stats", keywords: ["cijfers", "tellers", "statistiek", "getallen", "stats"],
-    defaults: () => ({ columns: 3, animate: true, items: [{ prefix: "", value: "25", suffix: "+", label: "Jaar ervaring" }, { prefix: "", value: "500", suffix: "", label: "Tevreden cursisten" }, { prefix: "", value: "100", suffix: "%", label: "Met plezier" }] }),
+    defaults: () => ({ columns: 3, animate: true, items: [{ prefix: "", value: "0", suffix: "", label: "Omschrijving" }, { prefix: "", value: "0", suffix: "", label: "Omschrijving" }, { prefix: "", value: "0", suffix: "", label: "Omschrijving" }] }),
     fields: [F.items("items", "Cijfers", "label", [F.text("prefix", "Voor het getal (bijv. €)"), F.text("value", "Getal"), F.text("suffix", "Na het getal (bijv. +, %)"), F.text("label", "Omschrijving")], () => ({ prefix: "", value: "0", suffix: "", label: "Omschrijving" })), F.range("columns", "Naast elkaar", 1, 4), F.toggle("animate", "Laten optellen bij in beeld komen")],
   },
   timeline: {
     label: "Tijdlijn", group: "Kaarten & lijsten", icon: "timeline", keywords: ["tijdlijn", "timeline", "geschiedenis", "agenda", "cv"],
-    defaults: () => ({ items: [{ date: "2020", title: "Eerste gebeurtenis", text: "Wat gebeurde er?" }, { date: "2023", title: "Tweede gebeurtenis", text: "En daarna?" }] }),
+    defaults: () => ({ items: [{ date: "Jaar", title: "Titel", text: "Korte omschrijving." }, { date: "Jaar", title: "Titel", text: "Korte omschrijving." }] }),
     fields: [F.items("items", "Gebeurtenissen", "title", [F.text("date", "Datum / jaar"), F.text("title", "Titel"), F.area("text", "Tekst")], () => ({ date: "", title: "Nieuwe gebeurtenis", text: "" }))],
   },
   steps: {
     label: "Stappenplan", group: "Kaarten & lijsten", icon: "layers", keywords: ["stappen", "stappenplan", "werkwijze", "proces"],
-    defaults: () => ({ columns: 3, items: [{ title: "Kennismaken", text: "We bespreken je wensen." }, { title: "Samen plannen", text: "We maken een plan." }, { title: "Aan de slag", text: "En dan beginnen we." }] }),
+    defaults: () => ({ columns: 3, items: [{ title: "Titel", text: "Korte omschrijving." }, { title: "Titel", text: "Korte omschrijving." }, { title: "Titel", text: "Korte omschrijving." }] }),
     fields: [F.items("items", "Stappen", "title", [F.text("title", "Titel"), F.area("text", "Tekst")], () => ({ title: "Nieuwe stap", text: "" })), F.range("columns", "Naast elkaar", 1, 4)],
   },
   reviews: {
     label: "Reviews / ervaringen", group: "Kaarten & lijsten", icon: "star", keywords: ["reviews", "ervaringen", "beoordelingen", "referenties"],
-    defaults: () => ({ title: "Wat anderen zeggen", items: [{ name: "Naam", role: "", text: "Een mooie ervaring…", rating: 5 }] }),
+    defaults: () => ({ title: "Titel", items: [{ name: "Naam", role: "", text: "Hier komt de tekst van de review.", rating: 5 }] }),
     fields: [F.text("title", "Titel boven het blok"), F.items("items", "Reviews", "name", [F.text("name", "Naam"), F.text("role", "Functie / organisatie"), F.area("text", "Review", { rows: 4 }), F.select("rating", "Sterren", [[5, "★★★★★"], [4, "★★★★☆"], [3, "★★★☆☆"], [2, "★★☆☆☆"], [1, "★☆☆☆☆"]], { number: true })], () => ({ name: "Naam", role: "", text: "", rating: 5 }))],
   },
   faq: {
     label: "Veelgestelde vragen", group: "Kaarten & lijsten", icon: "help", keywords: ["faq", "vragen", "accordeon", "uitklappen"],
-    defaults: () => ({ variant: "lines", firstOpen: false, items: [{ question: "Een veelgestelde vraag?", answer: "Het antwoord hierop." }] }),
+    defaults: () => ({ variant: "lines", firstOpen: false, items: [{ question: "Vraag", answer: "Antwoord" }] }),
     fields: [F.items("items", "Vragen", "question", [F.text("question", "Vraag"), F.area("answer", "Antwoord", { rows: 4 })], () => ({ question: "Nieuwe vraag?", answer: "" })), F.select("variant", "Uiterlijk", [["lines", "Met lijnen"], ["cards", "Als kaarten"]]), F.toggle("firstOpen", "Eerste vraag standaard open")],
   },
   tabs: {
     label: "Tabbladen", group: "Kaarten & lijsten", icon: "tabs", keywords: ["tabs", "tabbladen", "tab"],
-    defaults: () => ({ items: [{ title: "Eerste tab", text: "Inhoud van de eerste tab." }, { title: "Tweede tab", text: "Inhoud van de tweede tab." }] }),
+    defaults: () => ({ items: [{ title: "Tab 1", text: "Hier komt de tekst." }, { title: "Tab 2", text: "Hier komt de tekst." }] }),
     fields: [F.items("items", "Tabbladen", "title", [F.text("title", "Tabnaam"), F.area("text", "Inhoud", { rows: 5 })], () => ({ title: "Nieuwe tab", text: "" }))],
   },
   tiles: {
@@ -264,7 +264,7 @@ export const BLOCKS = {
   // ===== Info =====
   hours: {
     label: "Openingstijden", group: "Info", icon: "clock", keywords: ["openingstijden", "tijden", "bereikbaar", "uren"],
-    defaults: () => ({ title: "Bereikbaar", note: "", items: [{ day: "Maandag – vrijdag", time: "09:00 – 17:00" }, { day: "Weekend", time: "Gesloten" }] }),
+    defaults: () => ({ title: "Titel", note: "", items: [{ day: "Dag(en)", time: "Tijden" }] }),
     fields: [F.text("title", "Titel"), F.items("items", "Regels", "day", [F.text("day", "Dag(en)"), F.text("time", "Tijden")], () => ({ day: "", time: "" })), F.text("note", "Opmerking onderaan")],
   },
   "contact-card": {

@@ -383,18 +383,21 @@
   font-family: var(--font-body); font-style: normal; text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.78rem; font-weight: 700; color: var(--color-accent);
 }
 
-/* Header: een gewone, vlakke balk met een lijn — geen zwevend dock */
-.look-studio .site-header, .look-studio .site-header.is-scrolled { top: 0; padding: 0; }
-.look-studio .site-header__island, .look-studio .site-header.is-scrolled .site-header__island {
-  display: flex; justify-content: flex-end; max-width: none; padding: 14px var(--space-4); border: none; border-bottom: 2px solid var(--color-primary);
-  border-radius: 0; background: var(--color-bg); backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none;
+/* Header: bovenaan een vlakke balk met een lijn; bij scrollen trekt hij samen
+   tot een dock (zoals op de gewone site), nu als een volle donkere pil. */
+.look-studio .site-header__island {
+  background: var(--color-bg); backdrop-filter: none; -webkit-backdrop-filter: none;
 }
-.look-studio .site-header__island::after { display: none; }
-.look-studio .site-header.is-scrolled .site-header__pinned { max-width: 900px; opacity: 1; margin-left: 0; pointer-events: auto; }
-.look-studio .site-header.is-scrolled .site-header__start { margin-right: auto; }
-.look-studio .site-header.is-scrolled .site-search { justify-self: auto; }
-.look-studio .nav-toggle { border-radius: 8px; }
-.look-studio .site-search input { border-radius: 8px; }
+.look-studio .site-header__island::after { background: var(--color-primary); opacity: 1; height: 2px; }
+.look-studio .site-header.is-scrolled .site-header__island {
+  background: var(--color-primary); border-color: var(--color-primary); box-shadow: 0 10px 0 -6px rgba(18, 58, 107, 0.18);
+}
+.look-studio .site-header.is-scrolled .site-logo { color: #fff; }
+.look-studio .site-header.is-scrolled .site-logo span { color: var(--studio-green-soft); }
+.look-studio .site-header.is-scrolled .site-search input { background: var(--color-bg); border-color: transparent; }
+.look-studio .site-header.is-scrolled .nav-toggle { background: var(--color-accent); color: var(--on-accent, #fff); }
+.look-studio .site-header.is-scrolled .nav-toggle:hover { background: #fff; color: var(--color-primary); }
+.look-studio .nav-toggle { border-radius: 999px; }
 
 /* Footer: één vlak */
 .look-studio .site-footer { background: var(--color-primary); margin-top: 0; }
