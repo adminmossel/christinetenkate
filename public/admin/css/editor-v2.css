@@ -3,14 +3,16 @@ body.ed-body { background: #F5F5F7; overflow: hidden; }
 .ed { height: 100vh; display: flex; flex-direction: column; font-family: var(--font-body); }
 
 /* ---------- Topbalk ---------- */
-.ed-top { height: 58px; flex-shrink: 0; display: grid; grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr); align-items: center; gap: 16px; padding: 0 16px; background: #fff; border-bottom: 1px solid var(--color-line); z-index: 30; }
-.ed-top__title { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.ed-top { height: 58px; flex-shrink: 0; display: flex; align-items: center; gap: 14px; padding: 0 16px; background: #fff; border-bottom: 1px solid var(--color-line); z-index: 30; }
+.ed-top .btn-admin { white-space: nowrap; flex-shrink: 0; width: auto; margin: 0; }
+.ed-top__title { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 200px; }
 .ed-back { width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; background: var(--color-bg-soft); color: var(--color-ink); font-size: 18px; flex-shrink: 0; }
 .ed-back:hover { background: var(--color-accent-soft); }
 #ed-title { border: none; background: transparent; font-size: 16px; font-weight: 600; min-width: 0; flex: 1; padding: 6px 8px; border-radius: 8px; color: var(--color-ink); }
 #ed-title:hover, #ed-title:focus { background: var(--color-bg-soft); outline: none; }
-.ed-top__center { display: flex; align-items: center; gap: 14px; }
-.ed-top__right { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.ed-top__center { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.ed-top__right { display: flex; align-items: center; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
+.status-pill { white-space: nowrap; flex-shrink: 0; }
 .ed-devices, .ed-hist { display: inline-flex; background: var(--color-bg-soft); padding: 3px; border-radius: 999px; gap: 2px; }
 .ed-devices button, .ed-hist button { border: none; background: transparent; width: 36px; height: 30px; border-radius: 999px; color: var(--color-ink-soft); font-size: 17px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
 .ed-devices svg { width: 18px; height: 18px; }
@@ -163,4 +165,18 @@ body.ed-preview .ed-frame { border-radius: 0; }
 #og-preview img { max-height: 90px; border-radius: 8px; margin-bottom: 8px; display: block; }
 .ver-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--color-line); font-size: 13px; }
 
-@media (max-width: 1100px) { .ed-main { grid-template-columns: 240px minmax(0,1fr) 300px; } .ed-top__right .btn-admin:not(.ed-gear):not(.btn-admin--primary):not(#ed-save) { display: none; } }
+@media (max-width: 1500px) { #ed-live, .save-status { display: none; } }
+@media (max-width: 1280px) { .ed-main { grid-template-columns: 250px minmax(0,1fr) 310px; } #ed-preview { display: none; } .ed-devices button { width: 32px; } }
+@media (max-width: 1100px) { .ed-top__center .ed-devices { display: none; } }
+
+/* ---------- Rondleiding ---------- */
+.tour-shade { position: fixed; inset: 0; z-index: 200; }
+.tour-spot { position: fixed; z-index: 201; border-radius: 14px; box-shadow: 0 0 0 9999px rgba(15,25,20,.62); pointer-events: none; transition: all .3s cubic-bezier(.4,0,.2,1); outline: 3px solid #fff; }
+.tour-card { position: fixed; z-index: 202; width: min(380px, calc(100vw - 32px)); background: #fff; border-radius: 18px; padding: 22px 24px 18px; box-shadow: 0 24px 70px rgba(0,0,0,.4); font-size: 17px; line-height: 1.5; color: var(--color-ink); }
+.tour-card__step { font-size: 13px; font-weight: 600; color: var(--color-primary); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+.tour-card h3 { margin: 0 0 8px; font-size: 22px; }
+.tour-card p { margin: 0 0 18px; }
+.tour-card__nav { display: flex; align-items: center; gap: 10px; }
+.tour-card__nav .btn-admin { font-size: 16px; padding: 10px 20px; }
+.tour-card__skip { margin-left: auto; border: none; background: none; color: var(--color-ink-soft); text-decoration: underline; cursor: pointer; font-size: 14px; }
+#ed-help { font-weight: 600; }

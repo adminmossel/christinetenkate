@@ -521,6 +521,7 @@ function buildShell() {
       </div>
       <div class="ed-top__right">
         <span id="ed-save-status" class="save-status"></span>
+        <button type="button" class="btn-admin" id="ed-help" title="Uitleg: hoe werkt deze pagina-editor?">? Uitleg</button>
         <button type="button" class="btn-admin" id="ed-preview" title="Voorbeeld zonder bewerkhulpmiddelen">Voorbeeld</button>
         <a class="btn-admin" id="ed-live" target="_blank" rel="noopener" hidden>Bekijk live ↗</a>
         <button type="button" class="btn-admin ed-gear" id="ed-gear" title="Pagina-instellingen (SEO, adres, versies)" aria-label="Pagina-instellingen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
@@ -588,6 +589,7 @@ function buildShell() {
 
   // topbalk
   $("#ed-title").addEventListener("input", (e) => { page.title = e.target.value; document.title = `${page.title || "Naamloos"} — Bewerken — Beheer`; commit({ render: "none", coalesce: "title" }); updateSeoPreview(); });
+  $("#ed-help").addEventListener("click", () => startTour(0));
   $("#ed-undo").addEventListener("click", undo);
   $("#ed-redo").addEventListener("click", redo);
   $("#ed-save").addEventListener("click", () => saveNow(false));
@@ -637,7 +639,72 @@ function buildShell() {
     else if (!typing && mod && e.key.toLowerCase() === "y") { e.preventDefault(); redo(); }
     else if (e.key === "Escape") { openSettings(false); if (insertTarget) { insertTarget = null; updateInsertHint(); } }
   });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") endTour(); });
+  try { if (!localStorage.getItem("ed-tour-done")) setTimeout(() => startTour(0), 1200); } catch { /* geen opslag beschikbaar */ }
   window.addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+}
+
+// ============================================================
+// Rondleiding (stap-voor-stap uitleg in gewone taal)
+// ============================================================
+const TOUR_STEPS = [
+  { target: "#ed-stage", title: "Welkom!", text: "Dit is je pagina. Wat je hier ziet, zien bezoekers ook. Je kunt alles op de pagina zelf aanpassen." },
+  { target: ".ed-left", title: "1. Onderdelen toevoegen", text: "Links staan de onderdelen die je kunt gebruiken: tekst, foto’s, knoppen en meer. Sleep er één naar de pagina, of klik er één aan om hem toe te voegen." },
+  { target: "#ed-stage", title: "2. Iets aanpassen", text: "Klik op iets op de pagina om het te kiezen. Dubbelklik op een tekst om er direct in te typen." },
+  { target: ".ed-right", title: "3. Opties aan de rechterkant", text: "Zodra je iets hebt aangeklikt, kun je hier de tekst, foto’s en kleuren veranderen. Klik je nergens op, dan stel je hier de achtergrond van de hele pagina in." },
+  { target: "#ed-stage", title: "4. De knopjes boven een onderdeel", text: "Boven het gekozen onderdeel staan knopjes: ⠿ vasthouden en slepen, ↑ ↓ omhoog of omlaag, ⎘ een kopie maken en 🗑 weghalen." },
+  { target: ".ed-hist", title: "Per ongeluk iets gedaan?", text: "Geen zorgen. Klik op ↶ om de laatste stap ongedaan te maken." },
+  { target: ".ed-top__right", title: "5. Opslaan en publiceren", text: "Je werk wordt vanzelf bewaard. Bezoekers zien de wijzigingen pas als je op ‘Publiceren’ klikt." },
+  { target: "#ed-gear", title: "6. Het tandwieltje", text: "Hier staat de titel zoals Google hem toont, het adres van de pagina en oudere versies waar je naar terug kunt." },
+  { target: null, title: "Klaar!", text: "Je kunt deze uitleg altijd opnieuw bekijken met de knop ‘? Uitleg’ bovenin." },
+];
+
+function endTour(markDone = true) {
+  document.querySelectorAll(".tour-shade, .tour-spot, .tour-card").forEach((n) => n.remove());
+  if (markDone) { try { localStorage.setItem("ed-tour-done", "1"); } catch { /* geen opslag beschikbaar */ } }
+}
+
+function startTour(index = 0) {
+  endTour(false);
+  const step = TOUR_STEPS[index];
+  const target = step.target ? $(step.target) : null;
+  const shade = document.createElement("div");
+  shade.className = "tour-shade";
+  shade.addEventListener("click", () => {});
+  document.body.appendChild(shade);
+
+  const spot = document.createElement("div");
+  spot.className = "tour-spot";
+  document.body.appendChild(spot);
+  const card = document.createElement("div");
+  card.className = "tour-card";
+  const last = index === TOUR_STEPS.length - 1;
+  card.innerHTML = `<div class="tour-card__step">Stap ${index + 1} van ${TOUR_STEPS.length}</div><h3>${esc(step.title)}</h3><p>${esc(step.text)}</p>
+    <div class="tour-card__nav">${index > 0 ? `<button type="button" class="btn-admin" id="tour-prev">← Terug</button>` : ""}<button type="button" class="btn-admin btn-admin--primary" id="tour-next">${last ? "Klaar" : "Volgende →"}</button>${last ? "" : `<button type="button" class="tour-card__skip" id="tour-skip">Overslaan</button>`}</div>`;
+  document.body.appendChild(card);
+
+  const pad = 6;
+  if (target) {
+    const r = target.getBoundingClientRect();
+    Object.assign(spot.style, { top: `${r.top - pad}px`, left: `${r.left - pad}px`, width: `${r.width + pad * 2}px`, height: `${r.height + pad * 2}px` });
+    const cw = card.offsetWidth, ch = card.offsetHeight;
+    let left, top;
+    if (r.left + r.width / 2 < window.innerWidth * 0.3) { left = r.right + 20; top = r.top + 60; }
+    else if (r.left + r.width / 2 > window.innerWidth * 0.7) { left = r.left - cw - 20; top = r.top + 60; }
+    else if (r.top > window.innerHeight * 0.5) { left = r.left + r.width / 2 - cw / 2; top = r.top - ch - 20; }
+    else { left = r.left + r.width / 2 - cw / 2; top = r.bottom + 20; }
+    if (r.height > window.innerHeight * 0.6) { top = window.innerHeight - ch - 40; left = Math.max(16, Math.min(window.innerWidth - cw - 16, r.left + r.width / 2 - cw / 2)); }
+    card.style.left = `${Math.max(16, Math.min(window.innerWidth - cw - 16, left))}px`;
+    card.style.top = `${Math.max(16, Math.min(window.innerHeight - ch - 16, top))}px`;
+  } else {
+    Object.assign(spot.style, { top: "50%", left: "50%", width: "0", height: "0" });
+    card.style.left = `${(window.innerWidth - card.offsetWidth) / 2}px`;
+    card.style.top = `${(window.innerHeight - card.offsetHeight) / 2}px`;
+  }
+  $("#tour-next").addEventListener("click", () => (last ? endTour() : startTour(index + 1)));
+  $("#tour-prev")?.addEventListener("click", () => startTour(index - 1));
+  $("#tour-skip")?.addEventListener("click", () => endTour());
+  $("#tour-next").focus();
 }
 
 // ============================================================
