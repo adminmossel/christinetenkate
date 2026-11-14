@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="/img/logo-blocks.png" type="image/png" />
+  <title>Nieuwe opmaak — Beheer</title>
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/admin/css/admin.css" />
+  <link rel="stylesheet" href="/admin/css/admin-theme.css" />
+  <link rel="stylesheet" href="/admin/css/restyle.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="/js/vendor/dompurify.min.js"></script>
+  <style id="auth-gate-style">body{visibility:hidden;}</style>
+</head>
+<body class="admin">
+  <div id="admin-main-content">
+    <div class="admin-header">
+      <div>
+        <h1>Nieuwe opmaak</h1>
+        <p>Een mooiere uitstraling voor je pagina’s, met dezelfde teksten en dezelfde volgorde.</p>
+      </div>
+    </div>
+
+    <div class="admin-card rs-intro">
+      <h3>Hoe werkt dit?</h3>
+      <ul>
+        <li><strong>Er verandert niets aan je teksten.</strong> Alleen kleuren, achtergronden, kaarten en de indeling van onderdelen veranderen. Voor elke pagina controleert het systeem dat de tekst, de volgorde en alle links precies gelijk blijven. Klopt er iets niet, dan wordt die pagina overgeslagen.</li>
+        <li><strong>Niets gebeurt vanzelf.</strong> Bekijk eerst per pagina het voorbeeld en kies dan zelf.</li>
+        <li><strong>Altijd terug.</strong> Van elke pagina wordt de oude versie bewaard. Met één knop zet je alles terug.</li>
+      </ul>
+    </div>
+
+    <div id="rs-banner"></div>
+    <div class="admin-card" id="rs-list">Pagina’s worden geladen…</div>
+  </div>
+
+  <div class="rs-modal" id="rs-modal" hidden>
+    <div class="rs-modal__bar">
+      <strong id="rs-modal-title"></strong>
+      <div class="rs-seg" id="rs-modal-version"></div>
+      <div class="rs-seg" id="rs-modal-device">
+        <button type="button" data-dev="desktop" class="is-active">Computer</button>
+        <button type="button" data-dev="mobile">Mobiel</button>
+      </div>
+      <span class="rs-modal__spacer"></span>
+      <button type="button" class="btn-admin" id="rs-modal-close">Sluiten</button>
+    </div>
+    <div class="rs-modal__stage"><div class="rs-modal__frame" id="rs-modal-frame" data-device="desktop"><iframe id="rs-canvas" title="Voorbeeld"></iframe></div></div>
+  </div>
+  <script type="module" src="/admin/js/restyle.js"></script>
+</body>
+</html>
