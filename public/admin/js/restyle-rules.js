@@ -17,9 +17,18 @@
 import { newId } from "./block-registry.js";
 import { renderBlocks, collectMediaIds } from "../../js/render.js";
 
+/** Elke pagina krijgt een eigen "toon" (kleur van de kop-band), zodat de site niet eentonig wordt. */
+const TONES = { home: "green", "even-voorstellen": "blue", "cursussen-workshops": "green", ouderavonden: "red", referenties: "blue", "handige-links": "green", contact: "red", "algemene-voorwaarden": "blue", "privacy-policy": "green" };
+export function toneForSlug(slug) {
+  if (TONES[slug]) return TONES[slug];
+  let h = 0;
+  for (const c of String(slug || "")) h = (h * 31 + c.charCodeAt(0)) % 3;
+  return ["green", "blue", "red"][h];
+}
+
 export const STUDIO = {
   navy: "#123A6B", ink: "#1A2433", red: "#CF3A2E", green: "#8FA800", greenLight: "#B9CF3F",
-  paper: "#FBF6E9", paper2: "#F3EBD6", greenSoft: "#E6EDBE", blueSoft: "#D9E4F2",
+  paper: "#FBF6E9", paper2: "#F3EBD6", greenSoft: "#E6EDBE", blueSoft: "#D9E4F2", redSoft: "#F6D9D3",
 };
 /** Kleuren voor Instellingen → Kleuren (koppen/voettekst, knoppen/links, achtergrond). */
 export const STUDIO_COLORS = { primary: STUDIO.navy, accent: STUDIO.red, bg: STUDIO.paper };
@@ -76,8 +85,6 @@ function transformOne(b) {
     case "quote": return [{ ...b, variant: "big" }];
     case "image": return [{ ...b, radius: b.radius || "sm" }];
     case "gallery": return [{ ...b, ratio: b.ratio || "4:3", gap: b.gap ?? 16, lightbox: b.lightbox !== false }];
-    case "contact-form":
-      return [b.style ? b : { ...b, style: { bg: "color", bgColor: STUDIO.paper2, boxed: true, radius: 8, padTop: 36, padBottom: 36, width: "narrow" } }];
     case "text": return textToBlocks(b);
     case "columns": return [{ ...b, items: (b.items || []).map((c) => ({ ...c, blocks: transformList(c?.blocks || []) })) }];
     case "group": return [{ ...b, blocks: transformList(b.blocks || []) }];
@@ -116,12 +123,13 @@ function decorateColumns(block) {
   });
 }
 
-function sectionStyle(kind, narrow) {
+function sectionStyle(kind, narrow, tone) {
+  const toneColor = { green: STUDIO.greenSoft, blue: STUDIO.blueSoft, red: STUDIO.redSoft }[tone] || STUDIO.greenSoft;
   const base = {
-    intro: { bg: "color", bgColor: STUDIO.greenSoft, padTop: 72, padBottom: 64 },
+    intro: { bg: "color", bgColor: toneColor, padTop: 72, padBottom: 64 },
     plain: { ruleTop: true, ruleWidth: 2, ruleColor: STUDIO.navy, padTop: 72, padBottom: 24 },
     cards: { bg: "color", bgColor: STUDIO.paper2, padTop: 72, padBottom: 80 },
-    faq: { bg: "color", bgColor: STUDIO.blueSoft, padTop: 72, padBottom: 72 },
+    faq: { bg: "color", bgColor: tone === "blue" ? STUDIO.greenSoft : STUDIO.blueSoft, padTop: 72, padBottom: 72 },
     reviews: { bg: "color", bgColor: STUDIO.navy, accentColor: STUDIO.greenLight, padTop: 80, padBottom: 80 },
   }[kind];
   const style = { ...base };
@@ -129,7 +137,7 @@ function sectionStyle(kind, narrow) {
   return style;
 }
 
-export function restyleBlocks(blocks) {
+export function restyleBlocks(blocks, { tone = "green" } = {}) {
   const flat = transformList(JSON.parse(JSON.stringify(blocks || [])));
   const content = flat.filter((b) => b.type !== "spacer" && b.type !== "divider");
 
@@ -151,7 +159,7 @@ export function restyleBlocks(blocks) {
       const hero = s.hero;
       if (!hero.style) {
         hero.style = i === 0
-          ? { bg: "color", bgColor: STUDIO.greenSoft, padTop: 72, padBottom: 72 }
+          ? { bg: "color", bgColor: { green: STUDIO.greenSoft, blue: STUDIO.blueSoft, red: STUDIO.redSoft }[tone], padTop: 72, padBottom: 72 }
           : s.last
             ? { bg: "color", bgColor: STUDIO.red, accentColor: STUDIO.paper, padTop: 80, padBottom: 80 }
             : { bg: "color", bgColor: STUDIO.paper2, padTop: 64, padBottom: 64 };
@@ -163,7 +171,7 @@ export function restyleBlocks(blocks) {
     const types = s.blocks.map((b) => b.type);
     const hasCards = types.includes("cards");
     const kind = out.length === 0 && !hasCards ? "intro" : types.includes("reviews") ? "reviews" : types.includes("cards") ? "cards" : types.includes("faq") ? "faq" : "plain";
-    out.push({ id: newId(), type: "group", blocks: s.blocks, style: sectionStyle(kind, types.every((t) => NARROW_OK.has(t))) });
+    out.push({ id: newId(), type: "group", blocks: s.blocks, style: sectionStyle(kind, types.every((t) => NARROW_OK.has(t)), tone) });
   });
   return out;
 }

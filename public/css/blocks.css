@@ -361,7 +361,7 @@
 .cards--blocks .card__body p { font-size: 1rem; }
 .cards--blocks .card:hover { transform: none; box-shadow: none; }
 .cards--blocks .card__body { padding: var(--space-4); }
-.cards--blocks .card__body h3 { font-size: var(--fs-lg); }
+.cards--blocks .card__body h3 { font-size: 1.45rem; line-height: 1.15; margin-bottom: 0.6rem; }
 .cards--blocks .card__link { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
 
 /* ================================================================

@@ -9,6 +9,7 @@
 // paginabewerker.
 import { requireAdmin } from "./admin-auth.js";
 import { db } from "../../js/firebase-init.js";
+import { restyleBlocks, restyleTheme, verifyRestyle, toneForSlug, STUDIO_COLORS } from "./restyle-rules.js";
 import {
   doc, setDoc, collection, query, where, getDocs, serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
@@ -512,7 +513,21 @@ async function upsertMedia(mediaDef) {
   log(`Media geplaatst: ${mediaDef.name}`);
 }
 
+// Zet de opbouw van de pagina om naar de nieuwe opmaak "Studio" (zie restyle-rules.js).
+// De tekst blijft precies zoals ze hierboven staat; dat wordt gecontroleerd. Lukt dat
+// niet, dan wordt de pagina in de oude opmaak geplaatst.
+function withStudioLook(pageDef) {
+  try {
+    const nb = restyleBlocks(pageDef.blocks, { tone: toneForSlug(pageDef.slug) });
+    const check = verifyRestyle(pageDef.blocks, nb);
+    if (check.ok) return { blocks: nb, theme: restyleTheme({}) };
+    log(`Let op: /${pageDef.slug} in de oude opmaak geplaatst (${check.reason}).`);
+  } catch (err) { console.error(err); }
+  return { blocks: pageDef.blocks, theme: {} };
+}
+
 async function upsertPage(pageDef, adminEmail) {
+  const look = withStudioLook(pageDef);
   const q = query(collection(db, "pages"), where("slug", "==", pageDef.slug));
   const snap = await getDocs(q);
   const now = serverTimestamp();
@@ -521,7 +536,8 @@ async function upsertPage(pageDef, adminEmail) {
     slug: pageDef.slug,
     status: "published",
     trashed: false,
-    blocks: pageDef.blocks,
+    blocks: look.blocks,
+    theme: look.theme,
     seo: pageDef.seo,
     updatedAt: now,
     updatedBy: adminEmail,
@@ -542,7 +558,7 @@ async function run() {
     document.getElementById("run-seed-btn").disabled = true;
     try {
       log("Bezig met plaatsen van instellingen…");
-      await setDoc(doc(db, "settings", "site"), SETTINGS, { merge: true });
+      await setDoc(doc(db, "settings", "site"), { ...SETTINGS, colors: { ...STUDIO_COLORS } }, { merge: true });
       log("Instellingen geplaatst.");
 
       log("Bezig met plaatsen van menu…");

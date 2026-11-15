@@ -14,7 +14,7 @@ import { requireAdmin } from "./admin-auth.js";
 import { renderAdminShell, showToast } from "./admin-shell.js";
 import { db } from "../../js/firebase-init.js";
 import { collection, getDocs, getDoc, doc, updateDoc, setDoc, deleteField, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { restyleBlocks, restyleTheme, verifyRestyle, STUDIO_COLORS } from "./restyle-rules.js";
+import { restyleBlocks, restyleTheme, verifyRestyle, toneForSlug, STUDIO_COLORS } from "./restyle-rules.js";
 
 const clone = (v) => JSON.parse(JSON.stringify(v));
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
@@ -43,7 +43,7 @@ function analyse(p) {
   const blocks = p.blocks || [];
   if (!blocks.length) return { applied, ok: false, reason: "de pagina is leeg", oldBlocks: blocks, oldTheme: p.theme || {} };
   try {
-    const newBlocks = restyleBlocks(blocks);
+    const newBlocks = restyleBlocks(blocks, { tone: toneForSlug(p.slug) });
     const check = verifyRestyle(blocks, newBlocks);
     if (!check.ok) return { applied, ok: false, reason: check.reason, oldBlocks: blocks, oldTheme: p.theme || {} };
     return { applied, ok: true, oldBlocks: blocks, oldTheme: p.theme || {}, newBlocks, newTheme: restyleTheme(p.theme) };
