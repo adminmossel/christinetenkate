@@ -437,3 +437,4 @@
 .look-studio .hero--no-image .hero__lead { margin-left: 0; margin-right: 0; }
 .look-studio .block-reviews__title { text-align: left; }
 .blk--dark .hero__lead, .blk--dark .banner__lead { color: var(--color-ink); }
+.look-studio .blk--dark :is(.eyebrow, .hero__eyebrow, .banner__eyebrow) { color: var(--studio-green-soft); }

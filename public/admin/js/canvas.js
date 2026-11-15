@@ -100,7 +100,17 @@ const selectedEl = () => (selectedId ? root.querySelector(`[data-bid="${selected
 function select(id, { scroll = false } = {}) {
   selectedId = id || null;
   restoreSelection();
-  if (scroll) selectedEl()?.scrollIntoView({ behavior: "smooth", block: "center" });
+  if (scroll) scrollToSelected();
+}
+
+// Let op: scrollIntoView scrolt ook de omliggende pagina (de editor) mee. Daarom scrollen
+// we hier bewust alleen dit canvas zelf.
+function scrollToSelected() {
+  const el = selectedEl();
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  const top = window.scrollY + r.top - Math.max(80, (window.innerHeight - r.height) / 2);
+  window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
 }
 
 function restoreSelection() {
@@ -198,7 +208,7 @@ function startEdit(node) {
   try { node.contentEditable = rich ? "true" : "plaintext-only"; } catch { node.contentEditable = "true"; }
   if (node.contentEditable !== "true" && node.contentEditable !== "plaintext-only") node.contentEditable = "true";
   node.classList.add("is-editing");
-  node.focus();
+  node.focus({ preventScroll: true });
   placeCaretAtEnd(node);
 
   const onInput = () => {

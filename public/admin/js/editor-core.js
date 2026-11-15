@@ -640,6 +640,8 @@ function buildShell() {
     else if (e.key === "Escape") { openSettings(false); if (insertTarget) { insertTarget = null; updateInsertHint(); } }
   });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") endTour(); });
+  // vangnet: de editorpagina zelf scrolt nooit (alleen het canvas en de zijpanelen)
+  window.addEventListener("scroll", () => { if (window.scrollY || window.scrollX) window.scrollTo(0, 0); });
   try { if (!localStorage.getItem("ed-tour-done")) setTimeout(() => startTour(0), 1200); } catch { /* geen opslag beschikbaar */ }
   window.addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
 }
