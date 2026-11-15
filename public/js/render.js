@@ -248,6 +248,7 @@ export function styleToCss(s = {}, mediaMap = {}) {
     vars["--color-accent"] = s.accentColor;
     vars["--color-accent-soft"] = `color-mix(in srgb, ${s.accentColor} 30%, transparent)`;
     vars["--on-accent"] = luminance(s.accentColor) > 0.55 ? "#1F2E27" : "#FFFFFF";
+    vars["--btn-bg"] = s.accentColor;
   }
   if (isCssColor(s.cardColor)) vars["--card-bg"] = s.cardColor;
 

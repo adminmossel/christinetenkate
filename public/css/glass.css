@@ -1,0 +1,201 @@
+/*
+  glass.css — het "glas"-thema voor de hele website.
+  Laad dit bestand NA style.css en blocks.css.
+
+  Het thema bouwt voort op de kleuren die in Instellingen zijn gekozen
+  (--color-primary, --color-accent, --color-bg): alle andere tinten worden
+  daarvan afgeleid, zodat de site er altijd bij elkaar passend uitziet.
+  Wil je het thema uitzetten? Haal dan de <link> naar dit bestand weg.
+*/
+
+:root {
+  /* Diepe tint van de hoofdkleur: voor koppen, knoppen en de voettekst (goed leesbaar). */
+  --g-deep: color-mix(in srgb, var(--color-primary) 52%, #0E190C);
+  --g-deeper: color-mix(in srgb, var(--color-primary) 34%, #08110A);
+  /* Glasvlakken */
+  --g-glass: color-mix(in srgb, #FFFFFF 58%, transparent);
+  --g-glass-strong: color-mix(in srgb, #FFFFFF 74%, transparent);
+  --g-edge: rgba(255, 255, 255, 0.72);
+  --g-blur: blur(18px) saturate(1.55);
+  --g-shadow: 0 1px 2px rgba(20, 30, 16, 0.05), 0 14px 38px -14px color-mix(in srgb, var(--g-deep) 38%, transparent);
+  --g-shine: inset 0 1px 0 rgba(255, 255, 255, 0.85), inset 0 -1px 0 rgba(255, 255, 255, 0.25);
+  --radius-md: 18px;
+  --radius-lg: 28px;
+}
+body, .blk { --g-heading: color-mix(in srgb, var(--color-primary) 55%, #0E190C); }
+.blk--dark { --g-heading: #FFFFFF; --g-glass: rgba(255, 255, 255, 0.1); --g-edge: rgba(255, 255, 255, 0.22); --g-shine: inset 0 1px 0 rgba(255, 255, 255, 0.18); }
+
+/* ---------- Achtergrond: zacht gekleurd licht waar het glas doorheen schijnt ---------- */
+body { background-color: var(--color-bg); position: relative; }
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  /* Zacht licht in de kleuren van het logo (groen, blauw, rood), verspreid over de hele pagina. */
+  background:
+    radial-gradient(38vw 34vh at 4% 2%, color-mix(in srgb, var(--color-primary) 42%, transparent), transparent 72%),
+    radial-gradient(34vw 32vh at 98% 6%, rgba(112, 176, 226, 0.40), transparent 72%),
+    radial-gradient(36vw 34vh at 96% 30%, rgba(240, 150, 128, 0.30), transparent 72%),
+    radial-gradient(36vw 34vh at 2% 44%, color-mix(in srgb, var(--color-accent) 30%, transparent), transparent 72%),
+    radial-gradient(38vw 34vh at 98% 62%, color-mix(in srgb, var(--color-primary) 32%, transparent), transparent 72%),
+    radial-gradient(36vw 34vh at 3% 80%, rgba(112, 176, 226, 0.32), transparent 72%),
+    radial-gradient(40vw 34vh at 90% 96%, rgba(240, 150, 128, 0.30), transparent 72%);
+}
+body[style*="background"]::before { opacity: 0.5; }
+
+h1, h2, h3, h4, h5, h6, .block-reviews__title { color: var(--g-heading); letter-spacing: -0.012em; }
+.block-heading, .hero__title { text-wrap: balance; }
+::selection { background: color-mix(in srgb, var(--color-primary) 35%, transparent); }
+
+/* ---------- Header: glazen balk → zwevend glazen dock ---------- */
+.site-header__island {
+  background: color-mix(in srgb, var(--color-bg) 55%, transparent);
+  backdrop-filter: blur(22px) saturate(1.7);
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  border-bottom: 1px solid var(--g-edge);
+}
+.site-header__island::after {
+  height: 1px; bottom: 0; opacity: 1;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-primary) 55%, transparent) 30%, color-mix(in srgb, var(--color-accent) 55%, transparent) 70%, transparent);
+}
+.site-header.is-scrolled .site-header__island {
+  background: color-mix(in srgb, var(--color-bg) 48%, transparent);
+  border: 1px solid var(--g-edge);
+  box-shadow: var(--g-shine), 0 24px 56px -18px color-mix(in srgb, var(--g-deep) 45%, transparent);
+}
+.site-header__pinned a[aria-current="page"], .main-nav__list a[aria-current="page"] { color: var(--g-heading); }
+.nav-toggle {
+  background-color: var(--g-deep);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 60%);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 8px 18px -8px color-mix(in srgb, var(--g-deep) 80%, transparent);
+}
+.nav-toggle:hover { background-color: color-mix(in srgb, var(--g-deep) 80%, var(--color-primary)); }
+.site-search input { background: var(--g-glass-strong); border: 1px solid var(--g-edge); box-shadow: var(--g-shine); }
+
+/* Uitklapmenu: een glazen paneel */
+.main-nav__more { background: rgba(20, 32, 16, 0.22); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.main-nav__panel {
+  background: color-mix(in srgb, var(--color-bg) 64%, transparent);
+  backdrop-filter: blur(30px) saturate(1.6);
+  -webkit-backdrop-filter: blur(30px) saturate(1.6);
+  border-left: 1px solid var(--g-edge);
+  box-shadow: -30px 0 70px rgba(20, 32, 16, 0.2), var(--g-shine);
+}
+.main-nav__list--more a:hover { background: var(--g-glass-strong); }
+
+/* ---------- Glasvlakken: kaarten, tegels, formulieren, vragen ---------- */
+.tile, .review-card, .block-contact-form, .block-file, .card, .price-card, .callout, .stat, .contact-card, .hours,
+.block-tabs__panel, .block-faq--cards details {
+  background: var(--card-bg, var(--g-glass));
+  backdrop-filter: var(--g-blur);
+  -webkit-backdrop-filter: var(--g-blur);
+  border: 1px solid var(--g-edge);
+  border-radius: var(--radius-md);
+  box-shadow: var(--g-shine), var(--g-shadow);
+}
+.review-card { border-top: 1px solid var(--g-edge); position: relative; }
+.review-card::before {
+  content: ""; position: absolute; left: var(--space-4); top: 0; width: 44px; height: 3px; border-radius: 0 0 3px 3px; background: var(--color-primary);
+}
+.tile:hover, .review-card:hover, .card:hover, .block-file:hover { box-shadow: var(--g-shine), 0 22px 50px -16px color-mix(in srgb, var(--g-deep) 45%, transparent); }
+.tile a, .card__link, .block-file__name { color: var(--g-heading); }
+.tile a::after { color: var(--color-primary); }
+.review-card__stars { color: color-mix(in srgb, var(--color-accent) 85%, #7A5200); }
+.review-card figcaption strong { color: var(--g-heading); }
+
+.block-faq details { border-bottom: 1px solid color-mix(in srgb, var(--g-deep) 18%, transparent); }
+.block-faq summary { color: var(--g-heading); }
+.block-faq summary::after { color: var(--color-primary); }
+.block-faq--cards details { padding: var(--space-3) var(--space-4); margin-bottom: var(--space-2); }
+
+.block-quote, .block-quote--classic {
+  background: var(--g-glass); border: 1px solid var(--g-edge); border-left: 4px solid var(--color-primary);
+  backdrop-filter: var(--g-blur); -webkit-backdrop-filter: var(--g-blur); box-shadow: var(--g-shine), var(--g-shadow);
+  border-radius: var(--radius-md);
+}
+.block-quote--big, .block-quote--plain { background: none; border: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; border-radius: 0; }
+.block-quote--plain { border-left: 3px solid var(--color-primary); }
+.block-image img, .image-text__media img, .carousel__slide img {
+  border-radius: var(--radius-md); border: 1px solid var(--g-edge); box-shadow: var(--g-shadow);
+}
+.block-gallery img { border-radius: 16px; border: 1px solid var(--g-edge); box-shadow: var(--g-shadow); }
+.block-embed { border-radius: var(--radius-md); border: 1px solid var(--g-edge); box-shadow: var(--g-shadow); }
+
+/* ---------- Hero ---------- */
+.hero::before { display: none; }
+.hero__eyebrow { color: color-mix(in srgb, var(--color-primary) 70%, #0E190C); }
+.hero__image {
+  padding: 10px; background: var(--g-glass); border: 1px solid var(--g-edge); border-radius: var(--radius-lg);
+  backdrop-filter: var(--g-blur); -webkit-backdrop-filter: var(--g-blur); box-shadow: var(--g-shine), 0 34px 70px -24px color-mix(in srgb, var(--g-deep) 45%, transparent);
+}
+.hero__image img { border-radius: calc(var(--radius-lg) - 8px); }
+.hero__image::after { display: none; }
+
+/* ---------- Knoppen ---------- */
+.btn {
+  background-color: var(--btn-bg, var(--g-deep));
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0) 58%);
+  color: var(--on-accent, #fff);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 10px 22px -10px color-mix(in srgb, var(--btn-bg, var(--g-deep)) 85%, transparent);
+}
+.btn:hover, .blk .btn:hover {
+  background-color: color-mix(in srgb, var(--btn-bg, var(--g-deep)) 78%, var(--color-primary));
+  color: var(--on-accent, #fff);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 16px 28px -12px color-mix(in srgb, var(--btn-bg, var(--g-deep)) 90%, transparent);
+}
+.btn--outline, .blk .btn--outline {
+  background: var(--g-glass); color: var(--g-heading); border: 1.5px solid color-mix(in srgb, var(--g-deep) 55%, transparent);
+  backdrop-filter: var(--g-blur); -webkit-backdrop-filter: var(--g-blur); box-shadow: var(--g-shine);
+}
+.btn--outline:hover, .blk .btn--outline:hover { background: var(--g-deep); color: #fff; border-color: var(--g-deep); }
+.blk .btn--soft { background-image: none; background-color: color-mix(in srgb, var(--color-primary) 22%, transparent); color: var(--g-heading); box-shadow: var(--g-shine); }
+.blk .btn--link { background: none; box-shadow: none; color: var(--g-heading); backdrop-filter: none; }
+.blk--dark .btn { background-color: #fff; background-image: none; color: var(--g-deep); box-shadow: 0 10px 22px -10px rgba(0, 0, 0, 0.4); }
+.blk--dark .btn:hover { background-color: color-mix(in srgb, #fff 86%, var(--color-primary)); color: var(--g-deeper); }
+.blk--dark .btn--outline { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.7); box-shadow: none; }
+.blk--dark .btn--outline:hover { background: #fff; color: var(--g-deep); }
+
+.sticky-contact {
+  background-color: var(--g-deep); background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 60%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 18px 34px -14px color-mix(in srgb, var(--g-deep) 80%, transparent);
+}
+.sticky-contact:hover { background-color: color-mix(in srgb, var(--g-deep) 80%, var(--color-primary)); }
+.back-to-top { background: var(--g-glass-strong); backdrop-filter: var(--g-blur); -webkit-backdrop-filter: var(--g-blur); border: 1px solid var(--g-edge); color: var(--g-heading); box-shadow: var(--g-shine), var(--g-shadow); }
+.back-to-top:hover { background: var(--g-deep); color: #fff; }
+
+/* ---------- Formulieren ---------- */
+.form-field input, .form-field textarea, .form-field select {
+  background: rgba(255, 255, 255, 0.7); border: 1px solid var(--g-edge); border-radius: 12px; box-shadow: inset 0 1px 2px rgba(20, 30, 16, 0.06);
+}
+.form-field input:focus, .form-field textarea:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 22%, transparent); background: #fff; }
+
+/* ---------- Voettekst: diep glas ---------- */
+.site-footer {
+  background:
+    radial-gradient(900px 320px at 12% 0%, color-mix(in srgb, var(--color-primary) 38%, transparent), transparent 70%),
+    radial-gradient(700px 300px at 92% 100%, rgba(120, 178, 224, 0.22), transparent 70%),
+    var(--g-deeper);
+  border-radius: 40px 40px 0 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  margin-top: var(--space-6);
+}
+.site-footer a { color: color-mix(in srgb, var(--color-primary) 40%, #fff); }
+.site-footer a:hover { color: #fff; }
+.site-footer__bottom { color: rgba(255, 255, 255, 0.7); border-top-color: rgba(255, 255, 255, 0.14); }
+.site-footer__badge { background: rgba(255, 255, 255, 0.92); }
+
+/* Bijzondere vlakken uit de editor blijven netjes */
+.blk--boxed { border: 1px solid var(--g-edge); }
+.drop-hint { background: rgba(255, 255, 255, 0.4); }
+@media (max-width: 700px) {
+  .site-footer { border-radius: 28px 28px 0 0; }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .tile, .review-card, .block-contact-form, .block-file, .card, .price-card, .callout, .stat, .contact-card, .hours, .block-tabs__panel { background: var(--card-bg, rgba(255, 255, 255, 0.9)); }
+  .site-header__island { background: var(--color-bg); }
+  .main-nav__panel { background: var(--color-bg); }
+}
